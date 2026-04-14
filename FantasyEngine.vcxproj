@@ -146,6 +146,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\VSProjects\FantasyMagic\src\glad.c" />
     <ClCompile Include="game\src\player\player_movement.cpp" />
+    <None Include="resources\shaders\internal\ase_light_functions.glsl">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="source\graphics\post_processing\post_effect.cpp" />
     <ClCompile Include="source\graphics\models\fullscreen_quad_mesh.cpp" />
     <ClCompile Include="game\src\data\block.cpp" />

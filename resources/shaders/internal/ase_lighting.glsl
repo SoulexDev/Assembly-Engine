@@ -1,3 +1,5 @@
+#include "internal/ase_light_functions.glsl"
+
 //rendering
 uniform vec3 uLightPos;
 uniform vec3 uViewPos;
@@ -72,8 +74,8 @@ vec3 lighting_pbr(ShadeParams p){
 	shadow = mix(shadow, 1.0, dist);
 	return p.albedo * (nl * shadow + vec3(0.125, 0.1, 0.05));
 }
-//vec3 lighting_npr_illustrative(){
-//
+//vec3 lighting_npr_illustrative(ShadeParams p){
+//	
 //}
 //vec3 lighting_npr_simple(){
 //

@@ -402,6 +402,9 @@
     <None Include="resources\shaders\internal\shadow.frag" />
     <None Include="resources\shaders\internal\ase_lighting.glsl" />
     <None Include="resources\shaders\internal\ase.glsl" />
+    <None Include="resources\shaders\internal\ase_light_functions.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\brick_medieval.jpg">
