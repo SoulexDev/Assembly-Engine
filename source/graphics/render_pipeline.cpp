@@ -90,14 +90,14 @@ int RenderPipeline::init() {
         *new RenderTexture(Engine::screenWidth, Engine::screenHeight));
 
     Shader* gammaShader = ResourceLoader<Shader>::load_resource_multi_path(
-        "H:/GitRepos/FantasyEngine/resources/shaders/internal/post_effect.vert",
-        "H:/GitRepos/FantasyEngine/resources/shaders/internal/gamma_correction_effect.frag");
+        "H:/GitRepos/AssemblyEngine/resources/shaders/internal/post_effect.vert",
+        "H:/GitRepos/AssemblyEngine/resources/shaders/internal/gamma_correction_effect.frag");
 
     if (gammaShader != nullptr) {
         push_post_effect(*new PostEffect(*gammaShader));
     }
 
-    shadowShader = *ResourceLoader<Shader>::load_resource("H:/GitRepos/FantasyEngine/resources/shaders/internal/shadow.vert");
+    shadowShader = *ResourceLoader<Shader>::load_resource("H:/GitRepos/AssemblyEngine/resources/shaders/internal/shadow.vert");
 
     //Create camera
     Camera::main = *new Camera();

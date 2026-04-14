@@ -8,15 +8,17 @@ uniform float uTime;
 //textures
 uniform sampler2D shadow_map;
 
-struct Light{
-	
-}
+//structs
 struct ShadeParams{
 	vec3 albedo;
 	vec3 normal;
-	vec3_specular;
+	vec3 specular;
 	float glossiness;
-}
+};
+struct Light{
+	vec4 position; //position if w = 1, direction if w = 0
+	vec4 color; //w is intensity
+};
 float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 	vec3 projCoords = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
 	projCoords *= 0.5;
@@ -37,7 +39,7 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
         float theta = 2.4 * float(i) + gl_FragCoord.x + gl_FragCoord.y + uTime * 16.0;
         float r = sqrt(float(i) + 0.5) / sqrt(float(sampleCount));
         vec2 u = r * vec2(cos(theta), sin(theta));
-        vec2 pos = projCoords.xy + u * texelSize * 2;
+        vec2 pos = projCoords.xy + u * texelSize * 2.0;
         
         float lightDepthPoint = texture(shadow_map, floor(pos * 1024.0) * texelSize + vec2(texelSize * 0.5)).r;
 		float lightDepthLinear = texture(shadow_map, pos).r;
@@ -47,11 +49,13 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
     }
 
 	//if the depth of the geometry, relative to the sun, is larger than the depth from the sun to the nearest visible point
-	return shadow / sampleCount;
+	return shadow / float(sampleCount);
 }
+
+//lighting methods
 vec3 lighting_pbr(ShadeParams p){
-	vec3 lightDir = normalize(uLightPos - vs_in.fragPos);
-	vec3 viewDir = normalize(uViewPos - vs_in.fragPos);
+	vec3 lightDir = normalize(uLightPos - v_in.fragPos);
+	vec3 viewDir = normalize(uViewPos - v_in.fragPos);
 
 	float nl = clamp(dot(p.normal, lightDir), 0.0, 1.0);
 	//float rv = clamp(dot(reflect(viewDir, normal), viewDir), 0.0, 1.0);
@@ -62,18 +66,18 @@ vec3 lighting_pbr(ShadeParams p){
 	float finalBias = max((1.0 - dot(p.normal, lightDir)) * normalBias, bias);
 
 	finalBias = gl_FrontFacing ? finalBias : 0.0;
-	float shadow = calculate_shadow(vs_in.lightSpaceFragPos, finalBias);
+	float shadow = calculate_shadow(v_in.lightSpaceFragPos, finalBias);
 	//vec3 spec = vec3(pow(rv, glossiness * 100.0)) * specular;
-	float dist = clamp(distance(vs_in.fragPos, uViewPos) / 16.0, 0.0, 1.0);
+	float dist = clamp(distance(v_in.fragPos, uViewPos) / 16.0, 0.0, 1.0);
 	shadow = mix(shadow, 1.0, dist);
 	return p.albedo * (nl * shadow + vec3(0.125, 0.1, 0.05));
 }
-vec3 lighting_npr_illustrative(){
-
-}
-vec3 lighting_npr_simple(){
-
-}
-vec3 lighting_npr_anime(){
-
-}
+//vec3 lighting_npr_illustrative(){
+//
+//}
+//vec3 lighting_npr_simple(){
+//
+//}
+//vec3 lighting_npr_anime(){
+//
+//}

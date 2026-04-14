@@ -17,6 +17,7 @@ const std::vector<std::string> includePaths = {
 };
 
 //Modified version of the original code by Wyck https://stackoverflow.com/a/78886109
+template<>
 std::string ResourceLoader<std::string>::fetch_include(std::string shaderRead) {
 	std::regex includeRegex(R"(#include\s*["<](.*?)[">])");
 	std::smatch match;
@@ -24,7 +25,7 @@ std::string ResourceLoader<std::string>::fetch_include(std::string shaderRead) {
 	std::string::const_iterator includeSearch(output.cbegin());
 
 	while (std::regex_search(includeSearch, output.cend(), match, includeRegex)) {
-		std::string includeDir = match[1].str();
+		std::string includeDir = "H:/GitRepos/AssemblyEngine/resources/shaders/" + match[1].str();
 		std::string content;
 		std::string filePath;
 		if (std::filesystem::exists(includeDir)) {
@@ -62,7 +63,7 @@ Shader* ResourceLoader<Shader>::load_resource(std::string filePath) {
 	std::string fragPath = vertPath.substr(0, vertPath.length() - 5) + ".frag";
 
 	std::string vertRead = ResourceLoader<std::string>::read_file(vertPath);
-	vertRead = fetch_include(vertRead);
+	vertRead = ResourceLoader<std::string>::fetch_include(vertRead);
 	if (vertRead.empty()) {
 		std::cout << "File is empty: " << vertRead << std::endl;
 		return nullptr;
@@ -70,7 +71,7 @@ Shader* ResourceLoader<Shader>::load_resource(std::string filePath) {
 	std::cout << vertRead << std::endl;
 
 	std::string fragRead = ResourceLoader<std::string>::read_file(fragPath);
-	fragRead = fetch_include(fragRead);
+	fragRead = ResourceLoader<std::string>::fetch_include(fragRead);
 	if (fragRead.empty()) {
 		std::cout << "File is empty: " << fragRead << std::endl;
 		return nullptr;
@@ -90,9 +91,10 @@ Shader* ResourceLoader<Shader>::load_resource(std::string filePath) {
 		return nullptr;
 	}
 }
+//template<typename Shader>
 Shader* ResourceLoader<Shader>::load_resource_multi_path(std::string vertPath, std::string fragPath) {
 	std::string vertRead = ResourceLoader<std::string>::read_file(vertPath);
-	vertRead = fetch_include(vertRead);
+	vertRead = ResourceLoader<std::string>::fetch_include(vertRead);
 	if (vertRead.empty()) {
 		std::cout << "File is empty: " << vertRead << std::endl;
 		return nullptr;
@@ -100,7 +102,7 @@ Shader* ResourceLoader<Shader>::load_resource_multi_path(std::string vertPath, s
 	std::cout << vertRead << std::endl;
 
 	std::string fragRead = ResourceLoader<std::string>::read_file(fragPath);
-	fragRead = fetch_include(fragRead);
+	fragRead = ResourceLoader<std::string>::fetch_include(fragRead);
 	if (fragRead.empty()) {
 		std::cout << "File is empty: " << fragRead << std::endl;
 		return nullptr;
@@ -120,6 +122,7 @@ Shader* ResourceLoader<Shader>::load_resource_multi_path(std::string vertPath, s
 		return nullptr;
 	}
 }
+template<>
 std::string ResourceLoader<std::string>::read_file(std::string filePath) {
 	std::cout << "Reading: " << filePath << std::endl;
 

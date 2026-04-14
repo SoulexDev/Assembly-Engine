@@ -12,8 +12,6 @@ public:
 	static Material opaqueMat;
 	static std::map<std::pair<int, int>, Chunk> chunks;
 
-	static int checkCountFuckDebugging;
-
 	static void generate();
 	static BlockType get_block(int x, int y, int z);
 	static Block get_block_data(int x, int y, int z);

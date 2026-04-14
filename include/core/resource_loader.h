@@ -1,12 +1,10 @@
 #include <string>
 
-template<class T>
+template<typename T>
 class ResourceLoader {
-private:
-	static std::string fetch_include(std::string shaderRead);
 public:
+	static T fetch_include(std::string shaderRead);
 	static T* load_resource(std::string filePath);
-	static T read_file(std::string filePath);
-
 	static T* load_resource_multi_path(std::string pathA, std::string pathB);
+	static T read_file(std::string filePath);
 };

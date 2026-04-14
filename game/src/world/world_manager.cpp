@@ -4,22 +4,20 @@
 #include "../../include/helpers/coordinate_helper.h"
 #include "../../../include/graphics/material.h"
 #include "../../include/data/block.h"
+#include "../../include/world/world_noise_generator.h"
+#include "../../../include/graphics/render_pipeline.h"
 
 #include <glm/glm.hpp>
 
 #include <map>
 #include <iostream>
-#include "../../include/world/world_noise_generator.h"
-#include "../../../include/graphics/render_pipeline.h"
 
 Material WorldManager::opaqueMat;
 std::map<std::pair<int, int>, Chunk> WorldManager::chunks;
 
-int WorldManager::checkCountFuckDebugging;
-
 void WorldManager::generate() {
-	Shader shader = *ResourceLoader<Shader>::load_resource("H:/GitRepos/FantasyEngine/resources/shaders/block.vert");
-	Texture2D texAtlas = *ResourceLoader<Texture2D>::load_resource("H:/GitRepos/FantasyEngine/resources/textures/tex_atlas.png");
+	Shader shader = *ResourceLoader<Shader>::load_resource("H:/GitRepos/AssemblyEngine/resources/shaders/block.vert");
+	Texture2D texAtlas = *ResourceLoader<Texture2D>::load_resource("H:/GitRepos/AssemblyEngine/resources/textures/tex_atlas.png");
 
 	opaqueMat = *new Material(shader);
 	opaqueMat.texture2Ds.push_back(std::make_pair("tex_atlas", texAtlas));
