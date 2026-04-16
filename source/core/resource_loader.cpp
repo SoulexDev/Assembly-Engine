@@ -130,7 +130,7 @@ std::string ResourceLoader<std::string>::read_file(std::string filePath) {
 
 	if (!file) {
 		std::cerr << "Failed to read file " << filePath << ". File doesn't exist." << std::endl;
-		return nullptr;
+		return "";
 	}
 
 	std::streamsize size = file.tellg();
@@ -139,7 +139,7 @@ std::string ResourceLoader<std::string>::read_file(std::string filePath) {
 	char* buffer = new char[size + 1]; // +1 for null terminator
 	if (!file.read(buffer, size)) {
 		delete[] buffer;
-		return nullptr;
+		return "";
 	}
 	buffer[size] = '\0'; // Null-terminate
 

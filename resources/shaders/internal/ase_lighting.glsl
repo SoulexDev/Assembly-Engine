@@ -60,19 +60,31 @@ vec3 lighting_pbr(ShadeParams p){
 	vec3 viewDir = normalize(uViewPos - v_in.fragPos);
 
 	float nl = clamp(dot(p.normal, lightDir), 0.0, 1.0);
-	//float rv = clamp(dot(reflect(viewDir, normal), viewDir), 0.0, 1.0);
+	float nv = clamp(dot(p.normal, viewDir), 0.0, 1.0);
+	float rv = clamp(dot(reflect(viewDir, p.normal), viewDir), 0.0, 1.0);
 
+	//diffuse
+	vec3 diffuse = p.albedo;
+	diffuse *= F0(nl, nv, rv, p.glossiness);
+
+	//specular
+	float distribution = trowbridge_reitz(nl, p.glossiness);
+	float fresnel = schlick_fresnel(rv);
+	float geometricShadow = schlick_ggx(nl, nv, p.glossiness);
+	vec3 spec = calculate_specular(p.specular, nl, nv, distribution, fresnel, geometricShadow);
+
+	//shadows
 	float bias = 0.001;
 	float normalBias = 0.0005;
-
 	float finalBias = max((1.0 - dot(p.normal, lightDir)) * normalBias, bias);
-
 	finalBias = gl_FrontFacing ? finalBias : 0.0;
 	float shadow = calculate_shadow(v_in.lightSpaceFragPos, finalBias);
-	//vec3 spec = vec3(pow(rv, glossiness * 100.0)) * specular;
 	float dist = clamp(distance(v_in.fragPos, uViewPos) / 16.0, 0.0, 1.0);
 	shadow = mix(shadow, 1.0, dist);
-	return p.albedo * (nl * shadow + vec3(0.125, 0.1, 0.05));
+
+	//final calculation
+	vec3 color = (diffuse + spec) * (nl * shadow + vec3(0.125, 0.1, 0.05));
+	return color;
 }
 //vec3 lighting_npr_illustrative(ShadeParams p){
 //	

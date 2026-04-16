@@ -9,8 +9,8 @@ float trowbridge_reitz(float nh, float glossiness){
 float trowbridge_reitz_anisotropic(float anisotropic, float nh, float hx, float hy, float glossiness){
 
     float aspect = sqrt(1.0 - anisotropic * 0.9);
-    float x = max(0.001, pow2(1.0 - glossiness) / aspect) * 5;
-    float y = max(0.001, pow2(1.0 - glossiness) * aspect) * 5;
+    float x = max(0.001, pow2(1.0 - glossiness) / aspect) * 5.0;
+    float y = max(0.001, pow2(1.0 - glossiness) * aspect) * 5.0;
     
     return 1.0 / (ASE_PI * x * y * pow2(pow2(hx / x) + pow2(hy / y) + nh * nh));
 }
@@ -33,10 +33,8 @@ float schlick_fresnel(float i){
 
 //normal incidence reflection calculation
 float F0 (float nl, float nv, float lh, float glossiness){
-    float fresnelLight = schlick_fresnel(nl); 
-    float fresnelView = schlick_fresnel(nv);
     float fresnelDiffuse90 = 0.5 + 2.0 * lh * lh * (1.0 - glossiness);
-    return mix(1.0, fresnelDiffuse90, fresnelLight) * mix(1.0, fresnelDiffuse90, fresnelView);
+    return mix(1.0, fresnelDiffuse90, schlick_fresnel(nl)) * mix(1.0, fresnelDiffuse90, schlick_fresnel(nv));
 }
 
 //specular

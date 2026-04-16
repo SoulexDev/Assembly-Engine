@@ -19,6 +19,6 @@ void main(){
 	p.albedo = texture(tex_atlas, v_in.texCoord).rgb * v_in.ao;
 	p.normal = v_in.normal;
 	p.specular = vec3(1.0);
-	p.glossiness = 0.0;
+	p.glossiness = 1.0;
 	FragColor = vec4(lighting_pbr(p), 1.0);
 }
