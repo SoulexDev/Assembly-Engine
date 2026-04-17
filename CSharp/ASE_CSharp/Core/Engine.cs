@@ -6,7 +6,7 @@ namespace ASE
 {
     public class Engine
     {
-        public static int width = 1920;
-        public static int height = 1080;
+        public static int screenWidth = 1920;
+        public static int screenHeight = 1080;
     }
 }

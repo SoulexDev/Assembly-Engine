@@ -22,8 +22,8 @@ namespace ASE
 
         public static void Init()
         {
-            lastMousePosX = Engine.width * 0.5f;
-            lastMousePosX = Engine.height * 0.5f;
+            lastMousePosX = Engine.screenWidth * 0.5f;
+            lastMousePosX = Engine.screenHeight * 0.5f;
 
             //InputBuffer i = new InputBuffer() { keyStates = SDL_GetKeyboardState() };
         }
@@ -43,11 +43,15 @@ namespace ASE
 
             SDL_MouseButtonFlags buttonFlags = SDL_GetMouseState(out float x, out float y);
 
-            mouseDeltaX = (lastMousePosX - x) / Engine.width;
-            mouseDeltaY = (lastMousePosY - y) / Engine.height;
+            mouseDeltaX = (lastMousePosX - x) / Engine.screenWidth;
+            mouseDeltaY = (lastMousePosY - y) / Engine.screenHeight;
 
             lastMousePosX = x;
             lastMousePosY = y;
+        }
+        public static void OnEvent()
+        {
+
         }
         public static void SetCurrentState()
         {

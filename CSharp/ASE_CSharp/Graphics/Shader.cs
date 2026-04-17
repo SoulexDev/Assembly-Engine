@@ -1,0 +1,150 @@
+﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using System.Runtime.CompilerServices;
+
+namespace ASE.Graphics
+{
+    public class Shader
+    {
+        public int id;
+        public Dictionary<string, int> uniformLocations = new Dictionary<string, int>();
+
+        public Shader(int id)
+        {
+            this.id = id;
+
+            int uniformCount = 0;
+            GL.GetProgram(id, GetProgramParameterName.ActiveUniforms, out uniformCount);
+            //GL.GetProgram(id, GetProgramParameterName.ActiveUniformMaxLength, out uniformLength);
+
+            for (int i = 0; i < uniformCount; i++)
+            {
+                string key = GL.GetActiveUniform(id, i, out _, out _);
+
+                uniformLocations.Add(key, GL.GetUniformLocation(id, key));
+            }
+        }
+        public void Use()
+        {
+            GL.UseProgram(id);
+        }
+        public void SetInt(string name, int value)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.Uniform1(uniformLocations[name], value);
+        }
+        public void SetFloat(string name, float value)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.Uniform1(uniformLocations[name], value);
+        }
+        public void SetVector(string name, Vector2 value)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.Uniform2(uniformLocations[name], value);
+        }
+        public void SetVector(string name, Vector3 value)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.Uniform3(uniformLocations[name], value);
+        }
+        public void SetVector(string name, Vector4 value)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.Uniform4(uniformLocations[name], value);
+        }
+        public void SetMatrix4(string name, Matrix4 value, bool transpose = false)
+        {
+            if (uniformLocations.ContainsKey(name))
+                GL.UniformMatrix4(uniformLocations[name], transpose, ref value);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetTexture(string name, int value)
+        {
+            SetInt(name, value);
+        }
+        public static bool CreateShaderProgram(out int id, string vertRead, string fragRead)
+        {
+            id = 0;
+
+            //create vertex shader
+            int vertShader = 0;
+            if (!CreateAndCompileShader(ref vertShader, vertRead, ShaderType.VertexShader))
+                return false;
+
+            //create fragment shader
+            int fragShader = 0;
+            if (!CreateAndCompileShader(ref fragShader, fragRead, ShaderType.FragmentShader))
+                return false;
+
+            //create and link shaders to shader program
+            id = GL.CreateProgram();
+            GL.AttachShader(id, vertShader);
+            GL.AttachShader(id, fragShader);
+            GL.LinkProgram(id);
+
+            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int success);
+            if (success != (int)All.True)
+            {
+                GL.GetShaderInfoLog(id, out string info);
+                Console.WriteLine(info);
+                return false;
+            }
+
+            GL.DeleteShader(vertShader);
+            GL.DeleteShader(fragShader);
+            return true;
+        }
+        public static bool CreateShaderProgram(out int id, params (string, ShaderType)[] shaderInfo)
+        {
+            id = 0;
+            int[] shaders = new int[shaderInfo.Length];
+
+            for (int i = 0; i < shaderInfo.Length; i++)
+            {
+                if (!CreateAndCompileShader(ref shaders[i], shaderInfo[i].Item1, shaderInfo[i].Item2))
+                    return false;
+            }
+            id = GL.CreateProgram();
+            for (int i = 0; i < shaders.Length; i++)
+            {
+                GL.AttachShader(id, shaders[i]);
+            }
+            GL.LinkProgram(id);
+
+            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int success);
+            if (success != (int)All.True)
+            {
+                GL.GetShaderInfoLog(id, out string info);
+                Console.WriteLine(info);
+                return false;
+            }
+
+            for (int i = 0; i < shaders.Length; i++)
+            {
+                GL.DeleteShader(shaders[i]);
+            }
+            return true;
+        }
+        private static bool CreateAndCompileShader(ref int id, string shaderContent, ShaderType shaderType)
+        {
+            Console.WriteLine("Creating shader of type: " + shaderType.ToString());
+            id = GL.CreateShader(shaderType);
+            GL.ShaderSource(id, shaderContent);
+            GL.CompileShader(id);
+
+            GL.GetShader(id, ShaderParameter.CompileStatus, out int success);
+            if (success == (int)All.True)
+                return true;
+            else
+            {
+                GL.GetShaderInfoLog(id, out string info);
+                Console.WriteLine(info);
+                return false;
+            }
+        }
+
+        //operators
+        public static implicit operator Shader(int value) => new Shader(value);
+    }
+}

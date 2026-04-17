@@ -8,6 +8,7 @@
     <AssemblyTitle>ASE</AssemblyTitle>
     <ApplicationIcon>ase.ico</ApplicationIcon>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<LangVersion>14.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
