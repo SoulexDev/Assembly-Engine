@@ -5,6 +5,12 @@ namespace ASE.Graphics.Testing
 {
     internal class PlaneGenerator
     {
+        private static Vector2[] quadUVs = {
+            new Vector2(0.0f, 0.0f),
+            new Vector2(1.0f, 0.0f),
+            new Vector2(0.0f, 1.0f),
+            new Vector2(1.0f, 1.0f),
+        };
         private static Vector3[] quadVerts = {
             //bottom left, top left, bottom right,
             //bottom right, top left, top right,
@@ -31,10 +37,12 @@ namespace ASE.Graphics.Testing
             {
                 for (int x = 0; x < widthX; x++)
                 {
-                    //Vector2 uvCorner = new Vector2((float)x / (widthX - 1), (float)z / (widthZ - 1));
+                    Vector2 uvCorner = new Vector2((float)x / widthX, (float)z / widthZ);
                     for (int i = 0; i < 4; i++)
                     {
                         Vector3 vert = quadVerts[i];
+                        Vector2 uv = quadUVs[i];
+
                         //position
                         vertices.Add(x + vert.X - widthX * 0.5f);
                         vertices.Add(vert.Y);
@@ -46,19 +54,11 @@ namespace ASE.Graphics.Testing
                         vertices.Add(0.0f);
 
                         //uvs
-                        //(0 + 0) / 2
-                        //(0 + 0) / 2
-
-                        //(0 + 1) / 2
-                        //(0 + 0) / 2
-
-                        //(0 + 0) / 2
-                        //(0 + 1) / 2
-
-                        //(0 + 1) / 2
-                        //(0 + 1) / 2
-                        vertices.Add((x + vert.X) / (float)widthX);
-                        vertices.Add((z + vert.Z) / (float)widthZ);
+                        vertices.Add((float)(x + uv.X) / (float)widthX);
+                        vertices.Add((float)(z + uv.Y) / (float)widthZ);
+                        //vertices.Add(x + vert.X);
+                        //vertices.Add(z + vert.Z);
+                        //Console.WriteLine(new Vector2((float)(x + uv.X) / (float)widthX, (float)(z + uv.Y) / (float)widthZ));
                     }
 
                     indices.Add(index);

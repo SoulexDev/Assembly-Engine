@@ -1,6 +1,7 @@
 ﻿using ASE.Graphics;
 using ASE.Graphics.Testing;
 using ASE.Testing;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using static SDL3.SDL;
 
@@ -15,6 +16,9 @@ namespace ASE
         public static string AssetsPath;
         private static Cube cube;
         private static FreeCam freecam;
+
+        public static Shader defaultShader;
+
         public static void Main(string[] args)
         {
             AssetsPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -23,18 +27,26 @@ namespace ASE
             SDL_EnterAppMainCallbacks(0, 0, SDL_AppInit, SDL_AppIterate, SDL_AppEvent, SDL_AppQuit);
         }
         static SDL_AppInit_func SDL_AppInit = (nint appState, int argc, nint argv) => {
+            //initialize core functionalities
             if (!RenderPipeline.Init())
             {
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
             Input.Init();
 
+            //create internal objects
+            ResourceLoader.LoadResource(out defaultShader,
+                ("shaders/internal/simple_lit", ShaderType.VertexShader),
+                ("shaders/internal/simple_lit", ShaderType.FragmentShader));
+
+            ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
+
             freecam = new FreeCam(Camera.main);
 
-            ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
+            //ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
             ResourceLoader.LoadResource(out Texture2D cubeTex, "textures/tex_atlas.png");
-            Plane plane = PlaneGenerator.Generate(planeTex, 10, 10);
-            plane.transform.scale = Vector3.One * 4.0f;
+            //Plane plane = PlaneGenerator.Generate(planeTex, 2, 2);
+            //plane.transform.scale = Vector3.One * 4.0f;
 
             cube = new Cube(cubeTex);
 

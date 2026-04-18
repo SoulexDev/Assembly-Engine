@@ -12,6 +12,12 @@ namespace ASE.Graphics
 
         public AABB boundingBox;
 
+        public Renderable(Transform transform)
+        {
+            this.transform = transform;
+
+            RenderPipeline.AddRenderable(this);
+        }
         public Renderable(Transform transform, params (Mesh, Material)[] meshes)
         {
             this.transform = transform;

@@ -63,4 +63,5 @@ void main(){
 	nl = 1;
 	float shadow = (calculate_shadow(v_in.lightSpaceFragPos, finalBias) * nl + 0.2);
 	FragColor = vec4(diffuse * shadow, 1.0);
+	//FragColor = vec4(v_in.texCoord.x, v_in.texCoord.y, 0.0, 1.0);
 }
