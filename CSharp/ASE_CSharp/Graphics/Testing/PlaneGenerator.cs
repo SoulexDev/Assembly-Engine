@@ -1,0 +1,81 @@
+﻿using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+
+namespace ASE.Graphics.Testing
+{
+    internal class PlaneGenerator
+    {
+        private static Vector3[] quadVerts = {
+            //bottom left, top left, bottom right,
+            //bottom right, top left, top right,
+            new Vector3(0.0f, 0.0f, 0.0f), //bottom left - 0[0] 7
+            new Vector3(1.0f, 0.0f, 0.0f), //bottom right - 1[2, 3] 6
+            new Vector3(0.0f, 0.0f, 1.0f), //top left - 2[1, 4] 2
+            new Vector3(1.0f, 0.0f, 1.0f)  //top right - 3[5] 3
+        };
+        public static Plane Generate(Texture2D texture, int widthX = 10, int widthZ = 10)
+        {
+            ResourceLoader.LoadResource(out Shader shader, 
+                ("shaders/internal/simple_lit", ShaderType.VertexShader), 
+                ("shaders/internal/simple_lit", ShaderType.FragmentShader));
+
+            Material mat = new Material(shader);
+            mat.texture2Ds.Add(("uMainTex", texture));
+
+            List<float> vertices = new List<float>();
+            List<int> indices = new List<int>();
+
+            int index = 0;
+
+            for (int z = 0; z < widthZ; z++)
+            {
+                for (int x = 0; x < widthX; x++)
+                {
+                    //Vector2 uvCorner = new Vector2((float)x / (widthX - 1), (float)z / (widthZ - 1));
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Vector3 vert = quadVerts[i];
+                        //position
+                        vertices.Add(x + vert.X - widthX * 0.5f);
+                        vertices.Add(vert.Y);
+                        vertices.Add(z + vert.Z - widthZ * 0.5f);
+
+                        //normals
+                        vertices.Add(0.0f);
+                        vertices.Add(1.0f);
+                        vertices.Add(0.0f);
+
+                        //uvs
+                        //(0 + 0) / 2
+                        //(0 + 0) / 2
+
+                        //(0 + 1) / 2
+                        //(0 + 0) / 2
+
+                        //(0 + 0) / 2
+                        //(0 + 1) / 2
+
+                        //(0 + 1) / 2
+                        //(0 + 1) / 2
+                        vertices.Add((x + vert.X) / (float)widthX);
+                        vertices.Add((z + vert.Z) / (float)widthZ);
+                    }
+
+                    indices.Add(index);
+                    indices.Add(index + 2);
+                    indices.Add(index + 1);
+                    indices.Add(index + 1);
+                    indices.Add(index + 2);
+                    indices.Add(index + 3);
+
+                    index += 4;
+                }
+            }
+            
+            Mesh mesh = new Mesh(vertices, indices, PrimitiveType.Triangles, BufferUsageHint.StaticDraw, 
+                VertexAttribute.Vector3, VertexAttribute.Vector3, VertexAttribute.Vector2);
+
+            return new Plane(mesh, mat);
+        }
+    }
+}

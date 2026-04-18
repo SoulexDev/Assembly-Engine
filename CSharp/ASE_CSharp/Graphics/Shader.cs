@@ -1,6 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System.Runtime.CompilerServices;
 
 namespace ASE.Graphics
 {
@@ -13,14 +12,13 @@ namespace ASE.Graphics
         {
             this.id = id;
 
-            int uniformCount = 0;
-            GL.GetProgram(id, GetProgramParameterName.ActiveUniforms, out uniformCount);
-            //GL.GetProgram(id, GetProgramParameterName.ActiveUniformMaxLength, out uniformLength);
+            GL.GetProgram(id, GetProgramParameterName.ActiveUniforms, out int uniformCount);
+            GL.GetProgram(id, GetProgramParameterName.ActiveUniformMaxLength, out int uniformLength);
 
             for (int i = 0; i < uniformCount; i++)
             {
                 string key = GL.GetActiveUniform(id, i, out _, out _);
-
+                Console.WriteLine(key);
                 uniformLocations.Add(key, GL.GetUniformLocation(id, key));
             }
         }
@@ -58,43 +56,42 @@ namespace ASE.Graphics
             if (uniformLocations.ContainsKey(name))
                 GL.UniformMatrix4(uniformLocations[name], transpose, ref value);
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetTexture(string name, int value)
         {
             SetInt(name, value);
         }
-        public static bool CreateShaderProgram(out int id, string vertRead, string fragRead)
-        {
-            id = 0;
+        //public static bool CreateShaderProgram(out int id, string vertRead, string fragRead)
+        //{
+        //    id = 0;
 
-            //create vertex shader
-            int vertShader = 0;
-            if (!CreateAndCompileShader(ref vertShader, vertRead, ShaderType.VertexShader))
-                return false;
+        //    //create vertex shader
+        //    int vertShader = 0;
+        //    if (!CreateAndCompileShader(ref vertShader, vertRead, ShaderType.VertexShader))
+        //        return false;
 
-            //create fragment shader
-            int fragShader = 0;
-            if (!CreateAndCompileShader(ref fragShader, fragRead, ShaderType.FragmentShader))
-                return false;
+        //    //create fragment shader
+        //    int fragShader = 0;
+        //    if (!CreateAndCompileShader(ref fragShader, fragRead, ShaderType.FragmentShader))
+        //        return false;
 
-            //create and link shaders to shader program
-            id = GL.CreateProgram();
-            GL.AttachShader(id, vertShader);
-            GL.AttachShader(id, fragShader);
-            GL.LinkProgram(id);
+        //    //create and link shaders to shader program
+        //    id = GL.CreateProgram();
+        //    GL.AttachShader(id, vertShader);
+        //    GL.AttachShader(id, fragShader);
+        //    GL.LinkProgram(id);
 
-            GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int success);
-            if (success != (int)All.True)
-            {
-                GL.GetShaderInfoLog(id, out string info);
-                Console.WriteLine(info);
-                return false;
-            }
+        //    GL.GetProgram(id, GetProgramParameterName.LinkStatus, out int success);
+        //    if (success != (int)All.True)
+        //    {
+        //        GL.GetShaderInfoLog(id, out string info);
+        //        Console.WriteLine(info);
+        //        return false;
+        //    }
 
-            GL.DeleteShader(vertShader);
-            GL.DeleteShader(fragShader);
-            return true;
-        }
+        //    GL.DeleteShader(vertShader);
+        //    GL.DeleteShader(fragShader);
+        //    return true;
+        //}
         public static bool CreateShaderProgram(out int id, params (string, ShaderType)[] shaderInfo)
         {
             id = 0;

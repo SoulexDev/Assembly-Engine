@@ -1,4 +1,5 @@
-﻿using static SDL3.SDL;
+﻿using ASE.Graphics;
+using static SDL3.SDL;
 
 namespace ASE
 {
@@ -22,6 +23,10 @@ namespace ASE
 
         public static void Init()
         {
+            //SDL_SetWindowRelativeMouseMode(RenderPipeline.window, true);
+            //SDL_SetWindowMouseGrab(RenderPipeline.window, true);
+            SDL_CaptureMouse(true);
+
             lastMousePosX = Engine.screenWidth * 0.5f;
             lastMousePosX = Engine.screenHeight * 0.5f;
 
@@ -29,8 +34,8 @@ namespace ASE
         }
         public static void Update()
         {
-            float hl = IsKeyPressed(SDL_Scancode.SDL_SCANCODE_A) ? -1.0f : 0.0f;
-            float hr = IsKeyPressed(SDL_Scancode.SDL_SCANCODE_D) ? 1.0f : 0.0f;
+            float hl = IsKeyPressed(SDL_Scancode.SDL_SCANCODE_A) ? 1.0f : 0.0f;
+            float hr = IsKeyPressed(SDL_Scancode.SDL_SCANCODE_D) ? -1.0f : 0.0f;
             horizontal = hl + hr;
 
             float vf = IsKeyPressed(SDL_Scancode.SDL_SCANCODE_W) ? 1.0f : 0.0f;

@@ -1,6 +1,7 @@
-﻿using SDL3;
-using static SDL3.SDL;
+﻿using static SDL3.SDL;
 using OpenTK.Graphics.OpenGL4;
+using System.Runtime.CompilerServices;
+using OpenTK.Mathematics;
 
 namespace ASE.Graphics
 {
@@ -10,8 +11,9 @@ namespace ASE.Graphics
         public static nint window;
         public static nint glContext;
 
-        public static RenderTexture renderTex;
         public static RenderTexture shadowTex;
+        public static Shader shadowShader;
+        public static Camera sunCam;
 
         private static (RenderTexture, RenderTexture) postProcessBuffers;
 
@@ -45,7 +47,11 @@ namespace ASE.Graphics
 
             FullscreenQuadMesh.Create();
 
-            renderTex = new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal);
+            shadowTex = new RenderTexture(2048, 2048, RenderTextureType.Depth, TextureWrapMode.Repeat);
+            sunCam = new Camera(40.0f, 40.0f, 1.0f, 100.0f);
+            sunCam.transform.position = new Vector3(5.0f, 10.0f, 5.0f) * 4.0f;
+            sunCam.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegToRad * -135.0f);
+            sunCam.transform.rotation *= Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * 45.0f);
 
             postProcessBuffers = (
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal),
@@ -55,15 +61,24 @@ namespace ASE.Graphics
                 ("shaders/internal/post_effect", ShaderType.VertexShader), 
                 ("shaders/internal/gamma_correction_effect", ShaderType.FragmentShader));
 
-            PushPostEffect(new PostEffect(gammaShader));
+            //PushPostEffect(new PostEffect(gammaShader));
 
-            ResourceLoader.LoadResource(out Shader shadowShader, 
+            ResourceLoader.LoadResource(out shadowShader, 
                 ("shaders/internal/shadow", ShaderType.VertexShader), 
                 ("shaders/internal/shadow", ShaderType.FragmentShader));
 
             Camera.main = new Camera();
+            //Camera.main = sunCam;
 
             return true;
+        }
+        public static void AddRenderable(Renderable renderable)
+        {
+            renderables.Add(renderable);
+        }
+        public static void RemoveRenderable(Renderable renderable)
+        {
+            renderables.Remove(renderable);
         }
         public static void PushPostEffect(PostEffect postEffect)
         {
@@ -82,6 +97,24 @@ namespace ASE.Graphics
             //enable depth testing
             GL.Enable(EnableCap.DepthTest);
 
+            //render sun depth for shadows
+            GL.Viewport(0, 0, shadowTex.width, shadowTex.height);
+            //sunCam.transform.position = Camera.main.transform.position + new Vector3(5.0f, 5.0f, 5.0f) * 4.0f;
+
+            shadowTex.Bind();
+
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            sunCam.SetMatrices();
+
+            GL.Disable(EnableCap.CullFace);
+            foreach (Renderable renderable in renderables)
+            {
+                renderable.Draw(sunCam, shadowShader);
+            }
+            GL.Enable(EnableCap.CullFace);
+
+            shadowTex.Unbind();
+
             //render scene
             GL.Viewport(0, 0, Engine.screenWidth, Engine.screenHeight);
 
@@ -92,6 +125,10 @@ namespace ASE.Graphics
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             Camera.main.SetMatrices();
+            foreach (Renderable renderable in renderables)
+            {
+                renderable.Draw(Camera.main);
+            }
 
             if (postEffects.Count > 0)
                 postProcessBuffers.Item1.Unbind();

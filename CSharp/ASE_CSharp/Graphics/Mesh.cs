@@ -18,21 +18,33 @@ namespace ASE.Graphics
         {
             
         }
-        public Mesh(List<float> vertices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
+        public Mesh(float[] vertices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
         {
             this.primitiveType = primitiveType;
             this.drawType = drawType;
             SetMesh(vertices, attributes);
         }
-        public Mesh(List<float> vertices, List<uint> indices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
+        public Mesh(float[] vertices, int[] indices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
         {
             this.primitiveType = primitiveType;
             this.drawType = drawType;
             SetMesh(vertices, indices, attributes);
         }
-        public Mesh SetMesh(List<float> vertices, params VertexAttribute[] attributes)
+        public Mesh(List<float> vertices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
         {
-            if (vertices.Count <= 0)
+            this.primitiveType = primitiveType;
+            this.drawType = drawType;
+            SetMesh(vertices.ToArray(), attributes);
+        }
+        public Mesh(List<float> vertices, List<int> indices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
+        {
+            this.primitiveType = primitiveType;
+            this.drawType = drawType;
+            SetMesh(vertices.ToArray(), indices.ToArray(), attributes);
+        }
+        public Mesh SetMesh(float[] vertices, params VertexAttribute[] attributes)
+        {
+            if (vertices.Length <= 0)
             {
                 Console.WriteLine("Attempted to create mesh with no data. This is not allowed.");
                 return this;
@@ -46,7 +58,7 @@ namespace ASE.Graphics
                 GL.GenBuffers(1, out vbo);
             }
 
-            count = vertices.Count;
+            count = vertices.Length;
 
             GL.BindVertexArray(vao);
 
@@ -66,9 +78,9 @@ namespace ASE.Graphics
             generatedBuffers = true;
             return this;
         }
-        public Mesh SetMesh(List<float> vertices, List<uint> indices, params VertexAttribute[] attributes)
+        public Mesh SetMesh(float[] vertices, int[] indices, params VertexAttribute[] attributes)
         {
-            if (vertices.Count <= 0 || indices.Count <= 0)
+            if (vertices.Length <= 0 || indices.Length <= 0)
             {
                 Console.WriteLine("Attempted to create mesh with no data. This is not allowed.");
                 return this;
@@ -86,9 +98,9 @@ namespace ASE.Graphics
             GL.BindVertexArray(vao);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * sizeof(float), vertices.ToArray(), drawType);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices.ToArray(), drawType);
 
-            count = indices.Count;
+            count = indices.Length;
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
             GL.BufferData(BufferTarget.ElementArrayBuffer, count * sizeof(uint), indices.ToArray(), drawType);

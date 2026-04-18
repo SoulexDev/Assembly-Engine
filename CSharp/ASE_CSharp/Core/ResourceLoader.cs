@@ -22,37 +22,37 @@ namespace ASE
 
             texture = new Texture2D(filePath);
         }
-        public static bool LoadResource(out Shader shader, string filePath)
-        {
-            filePath = Path.Combine(Core.AssetsPath, filePath);
+        //public static bool LoadResource(out Shader shader, string filePath)
+        //{
+        //    filePath = Path.Combine(Core.AssetsPath, filePath);
 
-            string vertRead = File.ReadAllText(filePath + ".vert");
-            if (vertRead == string.Empty)
-            {
-                shader = -1;
-                return false;
-            }
-            Console.WriteLine(vertRead);
+        //    string vertRead = File.ReadAllText(filePath + ".vert");
+        //    if (vertRead == string.Empty)
+        //    {
+        //        shader = -1;
+        //        return false;
+        //    }
+        //    Console.WriteLine(vertRead);
 
-            string fragRead = File.ReadAllText(filePath + ".frag");
-            if (fragRead == string.Empty)
-            {
-                shader = -1;
-                return false;
-            }
-            Console.WriteLine(fragRead);
+        //    string fragRead = File.ReadAllText(filePath + ".frag");
+        //    if (fragRead == string.Empty)
+        //    {
+        //        shader = -1;
+        //        return false;
+        //    }
+        //    Console.WriteLine(fragRead);
 
-            if (Shader.CreateShaderProgram(out int id, vertRead, fragRead))
-            {
-                shader = id;
-                return true;
-            }
-            else
-            {
-                shader = -1;
-                return false;
-            }
-        }
+        //    if (Shader.CreateShaderProgram(out int id, vertRead, fragRead))
+        //    {
+        //        shader = id;
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        shader = -1;
+        //        return false;
+        //    }
+        //}
         public static bool LoadResource(out Shader shader, params (string, ShaderType)[] fileInfo)
         {
             (string, ShaderType)[] shaderInfo = new (string, ShaderType)[fileInfo.Length];

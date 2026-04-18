@@ -93,6 +93,6 @@ namespace ASE.Graphics
         }
 
         public static implicit operator uint(RenderTexture rt) => rt.texture.id;
-        public static implicit operator Texture2D(RenderTexture rt) => rt.texture;
+        //public static implicit operator Texture2D(RenderTexture rt) => rt.texture;
     }
 }

@@ -97,17 +97,13 @@ namespace ASE.Graphics
             else if (GL.IsEnabled(EnableCap.DepthTest))
                 GL.Disable(EnableCap.DepthTest);
 
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, RenderPipeline.shadowTex);
-            shader.SetTexture("shadow_map", 0);
-
             //textures
             if (texture2Ds.Count > 0)
             {
                 for (int i = 0; i < texture2Ds.Count; i++)
                 {
                     texture2Ds[i].Item2.Bind(GetTextureUnit(i + 1));
-                    shader.SetInt(texture2Ds[i].Item1, i + 1);
+                    shader.SetTexture(texture2Ds[i].Item1, i + 1);
                 }
             }
 

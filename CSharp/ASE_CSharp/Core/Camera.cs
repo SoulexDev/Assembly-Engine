@@ -27,12 +27,33 @@ namespace ASE
             transform = new Transform();
 
             fov = 90.0f;
-            orthoWidth = 4.0f;
-            orthoHeight = 4.0f;
+            orthoWidth = 16.0f;
+            orthoHeight = 9.0f;
             nearPlane = 0.1f;
             farPlane = 1000.0f;
 
             cameraProjectionType = CameraProjectionType.Perspective;
+        }
+        public Camera(float fov = 90.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
+        {
+            transform = new Transform();
+
+            this.fov = fov;
+            this.nearPlane = nearPlane;
+            this.farPlane = farPlane;
+
+            cameraProjectionType = CameraProjectionType.Perspective;
+        }
+        public Camera(float orthoWidth = 16.0f, float orthoHeight = 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
+        {
+            transform = new Transform();
+
+            this.orthoWidth = orthoWidth;
+            this.orthoHeight = orthoHeight;
+            this.nearPlane = nearPlane;
+            this.farPlane = farPlane;
+
+            cameraProjectionType = CameraProjectionType.Orthographic;
         }
         public void SetMatrices()
         {
