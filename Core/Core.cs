@@ -41,15 +41,37 @@ namespace ASE
                 ("shaders/internal/simple_lit", ShaderType.VertexShader),
                 ("shaders/internal/simple_lit", ShaderType.FragmentShader));
 
-            //load guitar
-            ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
-            Material mat = new Material(defaultShader);
+            //load stuff
+            //ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
+            ResourceLoader.LoadResource(out Renderable shrekRenderable, "models/shrek/Shrek.obj");
+            ResourceLoader.LoadResource(out Renderable donkeyRenderable, "models/donkey/Donkey.obj");
 
-            ResourceLoader.LoadResource(out Texture2D guitarTex, "models/1001_albedo.jpg");
-            mat.texture2Ds.Add(("uMainTex", guitarTex));
-            renderable.SetMaterial(mat);
+            Material shrekMat = new Material(defaultShader);
+            Material donkeyMat = new Material(defaultShader);
 
-            renderable.transform.Rotate(Vector3.UnitX, -90);
+            if (ResourceLoader.LoadResource(out Texture2D shrekAlbedo, "models/shrek/t_shrek_c.png"))
+            {
+                shrekMat.texture2Ds.Add(("uMainTex", shrekAlbedo));
+            }
+            if (ResourceLoader.LoadResource(out Texture2D donkeyAlbedo, "models/donkey/t_Donkey_c.png"))
+            {
+                donkeyMat.texture2Ds.Add(("uMainTex", donkeyAlbedo));
+            }
+
+            shrekRenderable.SetMaterial(shrekMat);
+            donkeyRenderable.SetMaterial(donkeyMat);
+
+            shrekRenderable.transform.position = Vector3.UnitX * 2;
+            donkeyRenderable.transform.position = -Vector3.UnitX * 2;
+
+            shrekRenderable.transform.scale = Vector3.One * 0.25f;
+            donkeyRenderable.transform.scale = Vector3.One * 0.5f * 0.25f;
+
+            //ResourceLoader.LoadResource(out Texture2D guitarTex, "models/1001_albedo.jpg");
+            //mat.texture2Ds.Add(("uMainTex", guitarTex));
+            //renderable.SetMaterial(mat);
+
+            //renderable.transform.Rotate(Vector3.UnitX, -90);
 
             freecam = new FreeCam(Camera.main);
 

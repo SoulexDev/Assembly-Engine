@@ -23,13 +23,15 @@ namespace ASE
         };
         private static Assimp.AssimpContext importer = new Assimp.AssimpContext();
 
-        public static void LoadResource(out Texture2D texture, string filePath)
+        public static bool LoadResource(out Texture2D texture, string filePath)
         {
             filePath = Path.Combine(Core.AssetsPath, filePath);
 
             Console.WriteLine("Loading texture " + filePath);
 
             texture = new Texture2D(filePath);
+
+            return true;
         }
         public static bool LoadResource(out Shader shader, params (string, ShaderType)[] fileInfo)
         {

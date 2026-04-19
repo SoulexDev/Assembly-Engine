@@ -26,7 +26,7 @@ namespace ASE.Testing
             moveVector = camera.transform.right * Input.horizontal + camera.transform.up * Input.longitudinal + camera.transform.forward * Input.vertical;
             moveVector.Normalize();
 
-            moveVector *= 16;
+            moveVector *= 2;
 
             if (moveVector.Length > 0)
                 camera.transform.position += moveVector * Time.deltaTime;
