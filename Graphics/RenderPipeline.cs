@@ -47,7 +47,7 @@ namespace ASE.Graphics
 
             FullscreenQuadMesh.Create();
 
-            shadowTex = new RenderTexture(2048, 2048, RenderTextureType.Depth, TextureWrapMode.Repeat);
+            shadowTex = new RenderTexture(2048, 2048, RenderTextureType.Depth, TextureWrapMode.ClampToBorder, TextureMinFilter.Linear, TextureMagFilter.Linear);
             sunCam = new Camera(40.0f, 40.0f, 1.0f, 100.0f);
             sunCam.transform.position = new Vector3(5.0f, 10.0f, 5.0f) * 4.0f;
             sunCam.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegToRad * -135.0f);

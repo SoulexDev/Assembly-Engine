@@ -76,7 +76,7 @@ namespace ASE
 
             using (Stream stream = File.OpenRead(filePath))
             {
-                Assimp.Scene scene = importer.ImportFileFromStream(stream, fileType);
+                Assimp.Scene scene = importer.ImportFileFromStream(stream, Assimp.PostProcessSteps.Triangulate, fileType);
 
                 if (scene == null || ((scene.SceneFlags & Assimp.SceneFlags.Incomplete) != 0) || scene.RootNode == null)
                 {
@@ -138,15 +138,18 @@ namespace ASE
                 }
 
                 //uvs
-                for (int t = 0; t < assimpMesh.TextureCoordinateChannelCount; t++)
+                if (assimpMesh.HasTextureCoords(0))
                 {
-                    if (assimpMesh.HasTextureCoords(t))
-                    {
-                        Assimp.Vector3D texCoord = assimpMesh.TextureCoordinateChannels[t][i];
-                        vertices.Add(texCoord.X);
-                        vertices.Add(texCoord.Y);
-                    }
+                    Assimp.Vector3D texCoord = assimpMesh.TextureCoordinateChannels[0][i];
+                    vertices.Add(texCoord.X);
+                    vertices.Add(texCoord.Y);
                 }
+
+                //uvs
+                //for (int t = 0; t < assimpMesh.TextureCoordinateChannelCount; t++)
+                //{
+
+                //}
 
                 //vertex colors
                 //for (int v = 0; v < assimpMesh.VertexColorChannelCount; v++)
@@ -166,7 +169,6 @@ namespace ASE
             for (int i = 0; i < assimpMesh.FaceCount; i++)
             {
                 Assimp.Face face = assimpMesh.Faces[i];
-
                 for (int j = 0; j < face.IndexCount; j++)
                 {
                     indices.Add(face.Indices[j]);
@@ -198,6 +200,7 @@ namespace ASE
                 mat.GetMaterialTexture(type, i, out Assimp.TextureSlot assimpTexture);
                 //TODO: update texture to allow per U/V wrap modes
                 textures.Add((textureName + i, new Texture2D(assimpTexture.FilePath, texWrapModeBindings[assimpTexture.WrapModeU])));
+                Console.WriteLine(assimpTexture.FilePath);
             }
         }
         //private static string PreprocessShaderContent(string shaderRead)

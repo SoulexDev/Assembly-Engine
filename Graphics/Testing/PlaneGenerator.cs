@@ -19,7 +19,7 @@ namespace ASE.Graphics.Testing
             new Vector3(0.0f, 0.0f, 1.0f), //top left - 2[1, 4] 2
             new Vector3(1.0f, 0.0f, 1.0f)  //top right - 3[5] 3
         };
-        public static Plane Generate(Texture2D texture, int widthX = 10, int widthZ = 10)
+        public static Plane Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10)
         {
             ResourceLoader.LoadResource(out Shader shader, 
                 ("shaders/internal/simple_lit", ShaderType.VertexShader), 
@@ -72,7 +72,7 @@ namespace ASE.Graphics.Testing
                 }
             }
             
-            Mesh mesh = new Mesh(vertices, indices, PrimitiveType.Triangles, BufferUsageHint.StaticDraw, 
+            Mesh mesh = new Mesh(vertices, indices, primitiveType, BufferUsageHint.StaticDraw, 
                 VertexAttribute.Vector3, VertexAttribute.Vector3, VertexAttribute.Vector2);
 
             return new Plane(mesh, mat);

@@ -33,6 +33,8 @@ namespace ASE.Graphics
             this.pointerType = pointerType;
             this.sizeInBytes = sizeInBytes;
             this.componentsCount = componentsCount;
+
+            Console.WriteLine($"{pointerType.ToString()}, {sizeInBytes}");
         }
         public static int GetTotalSizeInBytes(params VertexAttribute[] attributes)
         {

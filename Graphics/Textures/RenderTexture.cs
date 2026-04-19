@@ -14,7 +14,10 @@ namespace ASE.Graphics
         public int width;
         public int height;
 
-        public RenderTexture(int width, int height, RenderTextureType renderTextureType, TextureWrapMode textureWrapMode = TextureWrapMode.Repeat)
+        public RenderTexture(int width, int height, RenderTextureType renderTextureType, 
+            TextureWrapMode textureWrapMode = TextureWrapMode.Repeat, 
+            TextureMinFilter minFilter = TextureMinFilter.Linear, 
+            TextureMagFilter magFilter = TextureMagFilter.Linear)
         {
             usesRBO = renderTextureType == RenderTextureType.Normal;
 
@@ -30,7 +33,8 @@ namespace ASE.Graphics
             {
                 texture = new Texture2D(this.width, this.height,
                     PixelInternalFormat.DepthComponent, PixelFormat.DepthComponent,
-                    PixelType.Float, textureWrapMode: textureWrapMode);
+                    PixelType.Float, textureWrapMode: textureWrapMode,
+                    minFilter, magFilter);
 
                 GL.BindTexture(TextureTarget.Texture2D, texture);
                 float[] borderColor = { 1.0f, 1.0f, 1.0f, 1.0f };

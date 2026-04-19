@@ -34,21 +34,32 @@ namespace ASE
             }
             Input.Init();
 
+            GL.LineWidth(1.5f);
+
             //create internal objects
             ResourceLoader.LoadResource(out defaultShader,
                 ("shaders/internal/simple_lit", ShaderType.VertexShader),
                 ("shaders/internal/simple_lit", ShaderType.FragmentShader));
 
+            //load guitar
             ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
+            Material mat = new Material(defaultShader);
+
+            ResourceLoader.LoadResource(out Texture2D guitarTex, "models/1001_albedo.jpg");
+            mat.texture2Ds.Add(("uMainTex", guitarTex));
+            renderable.SetMaterial(mat);
+
+            renderable.transform.Rotate(Vector3.UnitX, -90);
 
             freecam = new FreeCam(Camera.main);
 
             //ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
-            ResourceLoader.LoadResource(out Texture2D cubeTex, "textures/tex_atlas.png");
-            //Plane plane = PlaneGenerator.Generate(planeTex, 2, 2);
-            //plane.transform.scale = Vector3.One * 4.0f;
+            ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
+            Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
+            plane.transform.scale = Vector3.One * 4.0f;
+            plane.transform.position = Vector3.UnitY * -2;
 
-            cube = new Cube(cubeTex);
+            //cube = new Cube(tex);
 
             return SDL_AppResult.SDL_APP_CONTINUE;
         };
@@ -60,8 +71,8 @@ namespace ASE
 
             freecam.Move();
 
-            cube!.transform.position = new Vector3(0.0f, (float)MathHelper.Sin(Time.time) + 0.5f, 0.0f);
-            cube.transform.Rotate(cube.transform.right + Vector3.UnitY, 30 * Time.deltaTime);
+            //cube!.transform.position = new Vector3(0.0f, (float)MathHelper.Sin(Time.time) + 0.5f, 0.0f);
+            //cube.transform.Rotate(cube.transform.right + Vector3.UnitY, 30 * Time.deltaTime);
 
             RenderPipeline.Render();
 

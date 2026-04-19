@@ -6,7 +6,7 @@ namespace ASE.Graphics
 {
     public class Renderable
     {
-        private Transform transform;
+        public Transform transform;
         public List<(Mesh, Material)> meshes = new List<(Mesh, Material)>();
         public Matrix4 modelMatrix;
 
@@ -24,6 +24,10 @@ namespace ASE.Graphics
             this.meshes.AddRange(meshes);
 
             RenderPipeline.AddRenderable(this);
+        }
+        public void SetMaterial(Material mat, int meshIndex = 0)
+        {
+            meshes[0] = (meshes[0].Item1, mat);
         }
         public void Draw(Camera camera)
         {

@@ -73,6 +73,8 @@ namespace ASE.Graphics
 
                 GL.VertexAttribPointer(i, attrib.componentsCount, attrib.pointerType, false, stride, offset);
                 GL.EnableVertexAttribArray(i);
+
+                offset += attrib.sizeInBytes;
             }
 
             generatedBuffers = true;
@@ -113,6 +115,8 @@ namespace ASE.Graphics
 
                 GL.VertexAttribPointer(i, attrib.componentsCount, attrib.pointerType, false, stride, offset);
                 GL.EnableVertexAttribArray(i);
+
+                offset += attrib.sizeInBytes;
             }
 
             generatedBuffers = true;
