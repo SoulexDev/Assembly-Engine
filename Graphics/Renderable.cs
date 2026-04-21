@@ -1,8 +1,8 @@
-﻿using ASE.Physics;
+﻿using AssemblyEngine.Physics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public class Renderable
     {
@@ -35,8 +35,8 @@ namespace ASE.Graphics
                 return;
 
             Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-            modelMatrix *= Matrix4.CreateTranslation(transform.position);
             modelMatrix *= Matrix4.CreateScale(transform.scale);
+            modelMatrix *= Matrix4.CreateTranslation(transform.position);
 
             foreach (var mesh in meshes)
             {
@@ -71,8 +71,8 @@ namespace ASE.Graphics
                 return;
 
             Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-            modelMatrix *= Matrix4.CreateTranslation(transform.position);
             modelMatrix *= Matrix4.CreateScale(transform.scale);
+            modelMatrix *= Matrix4.CreateTranslation(transform.position);       
 
             shader.Use();
 

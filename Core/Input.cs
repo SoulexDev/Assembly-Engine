@@ -1,7 +1,7 @@
-﻿using ASE.Graphics;
+﻿using AssemblyEngine.Graphics;
 using static SDL3.SDL;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class Input
     {

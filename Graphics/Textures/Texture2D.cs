@@ -2,7 +2,7 @@
 using StbImageSharp;
 using System.Runtime.CompilerServices;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public class Texture2D : IDisposable
     {

@@ -80,7 +80,9 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
     {
 		vec2 samplePoint = projCoords.xy + vogel_disk_sample(i, sampleCount, uTime / max(noise, 0.01)) * texelSize * 4;
         
-		float lightDepth = texture(uShadowTex0, to_pixel_point(samplePoint, 2048.0)).r;
+		float lightDepthPoint = texture(uShadowTex0, to_pixel_point(samplePoint, 2048.0)).r;
+		float lightDepthLinear = texture(uShadowTex0, samplePoint).r;
+		float lightDepth = max(lightDepthPoint, lightDepthLinear);
 
 		shadow += fragDepth - bias * 2 > lightDepth ? 0.0 : 1.0;
     }
@@ -90,6 +92,8 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 }
 
 void main(){
+	vec3 normal = normalize(v_in.normal);
+
 	vec3 lightDir = normalize(uLightPos - v_in.fragPos);
 	vec3 viewDir = normalize(uViewPos - v_in.fragPos);
 	
@@ -97,12 +101,14 @@ void main(){
 	
 	float bias = 0.001;
 	float normalBias = 0.001;
-	float finalBias = max((1.0 - dot(v_in.normal, lightDir)) * normalBias, bias);
+	float finalBias = max((1.0 - dot(normal, lightDir)) * normalBias, bias);
 	//finalBias = gl_FrontFacing ? finalBias : 0.0;
 	
-	float nl = pow(dot(v_in.normal, lightDir) * 0.5 + 0.5, 2);
-	nl = 1;
+	float nl = dot(normal, lightDir) * 0.5 + 0.5;
+	nl *= nl;
 	float shadow = (calculate_shadow(v_in.lightSpaceFragPos, finalBias) * nl + 0.2);
+	shadow = min(shadow, 1.0);
+
 	FragColor = vec4(diffuse * shadow, 1.0);
 	//FragColor = vec4(v_in.texCoord.x, v_in.texCoord.y, 0.0, 1.0);
 }

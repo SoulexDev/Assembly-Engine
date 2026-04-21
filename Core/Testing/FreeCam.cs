@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace ASE.Testing
+namespace AssemblyEngine.Testing
 {
     internal class FreeCam
     {

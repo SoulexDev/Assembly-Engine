@@ -1,4 +1,4 @@
-﻿namespace ASE.Graphics.Testing
+﻿namespace AssemblyEngine.Graphics.Testing
 {
     internal class Plane
     {

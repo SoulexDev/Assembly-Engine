@@ -1,4 +1,4 @@
-﻿namespace ASE.Physics
+﻿namespace AssemblyEngine.Physics
 {
     public class AABB
     {

@@ -1,7 +1,7 @@
-﻿using ASE.Graphics;
+﻿using AssemblyEngine.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class ResourceLoader
     {

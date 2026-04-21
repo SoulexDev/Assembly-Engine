@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ASE.Graphics.Testing
+namespace AssemblyEngine.Graphics.Testing
 {
     internal class Cube
     {

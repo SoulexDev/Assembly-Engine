@@ -1,12 +1,15 @@
 ﻿using OpenTK.Mathematics;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class Transform
     {
         public Transform? parent;
         public List<Transform>? children;
 
+        public Vector3 localPosition;
+        public Quaternion localRotation;
+        public Vector3 localScale;
         public Vector3 position
         {
             get
@@ -14,7 +17,8 @@ namespace ASE
                 if (parent == null)
                     return localPosition;
 
-                return parent.position + localPosition;
+                //Vector3 dir = localPosition;
+                return parent.position + parent.rotation * localPosition * parent.scale;
             }
             set
             {
@@ -58,11 +62,6 @@ namespace ASE
                     localScale = value / parent.scale;
             }
         }
-
-        public Vector3 localPosition = Vector3.Zero;
-        public Quaternion localRotation = Quaternion.Identity;
-        public Vector3 localScale = Vector3.One;
-
         public Vector3 right
         {
             get { return Vector3.Transform(Vector3.UnitX, rotation); }
@@ -82,39 +81,47 @@ namespace ASE
         {
             //if (transform == null && parent == null)
             //    return;
-            parent = transform;
-            //if (keepWorld)
-            //{
-            //    if (transform == null && parent != null)
-            //    {
-            //        localPosition += parent.position;
-            //        localRotation *= parent.rotation;
+            //parent = transform;
 
-            //        parent.children.Remove(this);
-            //        parent = null;
-            //    }
-            //    else if (transform != null)
-            //    {
-            //        localPosition -= parent!.position;
-            //        localRotation *= parent.rotation.Inverted();
+            if (transform != null)
+            {
+                if (keepWorld)
+                {
+                    Vector3 relativePos = position - transform.position;
+                    Quaternion relativeRot = rotation * transform.rotation.Inverted();
+                    Vector3 relativeScale = scale / transform.scale;
+                    parent = transform;
+                    localPosition = relativePos;
+                    localRotation = relativeRot;
+                    localScale = relativeScale;
+                }
+                else
+                {
+                    parent = transform;
+                    localPosition = Vector3.Zero;
+                    localRotation = Quaternion.Identity;
+                    localScale = Vector3.One;
+                }
+            }
+            else
+            {
+                if (keepWorld)
+                {
+                    Vector3 worldPos = position;
+                    Quaternion worldRot = rotation;
+                    Vector3 worldScale = scale;
 
-            //        parent = transform;
-            //        parent.children.Add(this);
-            //    }
-            //}
-            //else
-            //{
-            //    if (transform == null && parent != null)
-            //    {
-            //        parent.children.Remove(this);
-            //        parent = null;
-            //    }
-            //    else
-            //    {
-            //        parent = transform;
-            //        parent.children.Add(this);
-            //    }
-            //}
+                    parent = null;
+
+                    position = worldPos;
+                    rotation = worldRot;
+                    scale = worldScale;
+                }
+                else
+                {
+                    parent = null;
+                }
+            }
         }
         public void Rotate(Vector3 axis, float angle)
         {

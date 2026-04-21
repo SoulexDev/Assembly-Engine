@@ -1,6 +1,6 @@
 ﻿using static SDL3.SDL;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class Time
     {

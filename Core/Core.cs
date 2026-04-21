@@ -1,6 +1,7 @@
-﻿using ASE.Graphics;
-using ASE.Graphics.Testing;
-using ASE.Testing;
+﻿using AssemblyEngine.ECS;
+using AssemblyEngine.Graphics;
+using AssemblyEngine.Graphics.Testing;
+using AssemblyEngine.Testing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using static SDL3.SDL;
@@ -9,7 +10,7 @@ using static SDL3.SDL;
 
 //return sdl.Run(new Core(), args);
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class Core
     {
@@ -18,6 +19,7 @@ namespace ASE
         private static FreeCam freecam;
 
         public static Shader defaultShader;
+        private static Transform shrekT;
 
         public static void Main(string[] args)
         {
@@ -33,6 +35,8 @@ namespace ASE
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
             Input.Init();
+
+            ECSManager.Init();
 
             GL.LineWidth(1.5f);
 
@@ -58,11 +62,15 @@ namespace ASE
                 donkeyMat.texture2Ds.Add(("uMainTex", donkeyAlbedo));
             }
 
+            shrekT = shrekRenderable.transform;
+
             shrekRenderable.SetMaterial(shrekMat);
             donkeyRenderable.SetMaterial(donkeyMat);
 
-            shrekRenderable.transform.position = Vector3.UnitX * 2;
-            donkeyRenderable.transform.position = -Vector3.UnitX * 2;
+            shrekRenderable.transform.position = Vector3.UnitX * 0.5f + Vector3.UnitY;
+            donkeyRenderable.transform.position = -Vector3.UnitX * 0.5f + Vector3.UnitY;
+
+            donkeyRenderable.transform.SetParent(shrekRenderable.transform, true);
 
             shrekRenderable.transform.scale = Vector3.One * 0.25f;
             donkeyRenderable.transform.scale = Vector3.One * 0.5f * 0.25f;
@@ -78,8 +86,7 @@ namespace ASE
             //ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
             ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
             Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
-            plane.transform.scale = Vector3.One * 4.0f;
-            plane.transform.position = Vector3.UnitY * -2;
+            plane.transform.position = Vector3.UnitY;
 
             //cube = new Cube(tex);
 
@@ -92,6 +99,9 @@ namespace ASE
             Input.Update();
 
             freecam.Move();
+
+            //shrekT.position = Vector3.UnitY + Vector3.UnitZ * (float)MathHelper.Sin(Time.time);
+            shrekT.Rotate(Vector3.UnitY, 120 * Time.deltaTime);
 
             //cube!.transform.position = new Vector3(0.0f, (float)MathHelper.Sin(Time.time) + 0.5f, 0.0f);
             //cube.transform.Rotate(cube.transform.right + Vector3.UnitY, 30 * Time.deltaTime);

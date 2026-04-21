@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public class Shader
     {

@@ -1,6 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public enum VertexAttributeType { Int16 = 1, Int32 = 2, Int64 = 4, Float = 8, Vector2 = 16, Vector3 = 32, Vector4 = 64 };
     public class VertexAttribute

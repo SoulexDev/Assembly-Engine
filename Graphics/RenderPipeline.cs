@@ -1,9 +1,8 @@
 ﻿using static SDL3.SDL;
 using OpenTK.Graphics.OpenGL4;
-using System.Runtime.CompilerServices;
 using OpenTK.Mathematics;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public class RenderPipeline
     {

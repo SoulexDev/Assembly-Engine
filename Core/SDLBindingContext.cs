@@ -1,11 +1,7 @@
 ﻿using OpenTK;
-using SDL3;
 using static SDL3.SDL;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ASE
+namespace AssemblyEngine
 {
     internal class SDLBindingContext : IBindingsContext
     {

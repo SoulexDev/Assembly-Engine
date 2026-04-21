@@ -1,9 +1,6 @@
 ﻿using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public enum CameraProjectionType { Perspective, Orthographic }
     public class Camera

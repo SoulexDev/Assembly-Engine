@@ -1,6 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 
-namespace ASE.Graphics
+namespace AssemblyEngine.Graphics
 {
     public enum RenderTextureType { Normal, Depth }
     public class RenderTexture : IDisposable

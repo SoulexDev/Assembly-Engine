@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ASE
+namespace AssemblyEngine
 {
     public class Engine
     {
