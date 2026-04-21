@@ -84,6 +84,8 @@ namespace AssemblyEngine.Graphics
                 p.position = ASERandom.InSphere(1);
                 p.velocity = ASERandom.InSphere(1);
                 p.color = Color4.Aqua;
+
+                particles[i] = p;
             }
         }
         public void Stop()
@@ -101,7 +103,11 @@ namespace AssemblyEngine.Graphics
                 if (p.systemID != ID)
                     continue;
 
+                //p.velocity = p.position.Normalized();
+                p.velocity += -p.position * 0.2f;
                 p.position += p.velocity * Time.deltaTime;
+
+                particles[i] = p;
             }
             remainingDuration -= Time.deltaTime;
 

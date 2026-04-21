@@ -31,9 +31,9 @@ namespace AssemblyEngine
         public static Vector3 InSphere(float radius)
         {
             float u = random.NextSingle();
-            float x = random.NextSingle();
-            float y = random.NextSingle();
-            float z = random.NextSingle();
+            float x = random.NextSingle() * 2 - 1;
+            float y = random.NextSingle() * 2 - 1;
+            float z = random.NextSingle() * 2 - 1;
 
             float magnitude = (float)Math.Sqrt(x*x + y*y + z*z);
             x /= magnitude;

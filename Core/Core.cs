@@ -19,7 +19,8 @@ namespace AssemblyEngine
         private static FreeCam freecam;
 
         public static Shader defaultShader;
-        private static Transform shrekT;
+        public static Shader defaultParticleShader;
+        //private static Transform shrekT;
 
         public static void Main(string[] args)
         {
@@ -46,11 +47,14 @@ namespace AssemblyEngine
                 ("shaders/internal/simple_lit", ShaderType.VertexShader),
                 ("shaders/internal/simple_lit", ShaderType.FragmentShader));
 
+            ResourceLoader.LoadResource(out defaultParticleShader, 
+                ("shaders/internal/particle_unlit", ShaderType.VertexShader),
+                ("shaders/internal/particle_unlit", ShaderType.FragmentShader));
+
             //load stuff
             //ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
             ResourceLoader.LoadResource(out Renderable shrekRenderable, "models/shrek/Shrek.obj");
             ResourceLoader.LoadResource(out Renderable donkeyRenderable, "models/donkey/Donkey.obj");
-            ResourceLoader.LoadResource(out Texture2D particlesTex, "textures/gaussian_circle_1.png");
 
             Material shrekMat = new Material(defaultShader);
             Material donkeyMat = new Material(defaultShader);
@@ -64,7 +68,7 @@ namespace AssemblyEngine
                 donkeyMat.texture2Ds.Add(("uMainTex", donkeyAlbedo));
             }
 
-            shrekT = shrekRenderable.transform;
+            //shrekT = shrekRenderable.transform;
 
             shrekRenderable.SetMaterial(shrekMat);
             donkeyRenderable.SetMaterial(donkeyMat);
@@ -86,11 +90,12 @@ namespace AssemblyEngine
             freecam = new FreeCam(Camera.main);
 
             //ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
-            ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
-            Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
-            plane.transform.position = Vector3.UnitY;
+            //ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
+            //Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
+            //plane.transform.position = Vector3.UnitY * -1;
 
-            //ParticleManager.EmitParticles(particlesTex);
+            ResourceLoader.LoadResource(out Texture2D particlesTex, "textures/gaussian_circle_1.png");
+            ParticleManager.EmitParticles(particlesTex);
 
             //cube = new Cube(tex);
 
@@ -104,8 +109,9 @@ namespace AssemblyEngine
 
             freecam.Move();
 
+            ParticleManager.UpdateParticles();
             //shrekT.position = Vector3.UnitY + Vector3.UnitZ * (float)MathHelper.Sin(Time.time);
-            shrekT.Rotate(Vector3.UnitY, 120 * Time.deltaTime);
+            //shrekT.Rotate(Vector3.UnitY, 120 * Time.deltaTime);
 
             //cube!.transform.position = new Vector3(0.0f, (float)MathHelper.Sin(Time.time) + 0.5f, 0.0f);
             //cube.transform.Rotate(cube.transform.right + Vector3.UnitY, 30 * Time.deltaTime);

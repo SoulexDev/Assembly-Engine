@@ -39,22 +39,31 @@ namespace AssemblyEngine.Graphics
         {
             uint lastTexID = 0;
 
-            Core.defaultShader.Use();
+            Core.defaultParticleShader.Use();
 
-            GL.ActiveTexture(TextureUnit.Texture0);
+            Core.defaultParticleShader.SetMatrix4("uView", Camera.main.viewMatrix);
+            Core.defaultParticleShader.SetMatrix4("uProjection", Camera.main.projectionMatrix);
+
             GL.BindVertexArray(QuadMesh.mesh.vao);
             foreach(Particle p in particlePool)
             {
                 if (lastTexID != p.textureID)
                 {
+                    GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2D, p.textureID);
-                    Core.defaultShader.SetTexture("uMainTex", 0);
+                    Core.defaultParticleShader.SetTexture("uMainTex", 0);
                 }
+
+                Matrix4 modelMatrix = Matrix4.Identity;
+                modelMatrix *= Matrix4.CreateScale(Vector3.One);
+                modelMatrix *= Matrix4.CreateTranslation(p.position);
+
+                Core.defaultParticleShader.SetMatrix4("uModel", modelMatrix);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
                 lastTexID = p.textureID;
             }
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            //GL.BindTexture(TextureTarget.Texture2D, 0);
         }
         public static void StopParticles(int ID)
         {
