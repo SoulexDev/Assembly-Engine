@@ -36,8 +36,9 @@ namespace AssemblyEngine
             }
             Input.Init();
 
-            ECSManager.Init();
+            //ECSManager.Init();
 
+            QuadMesh.Create();
             GL.LineWidth(1.5f);
 
             //create internal objects
@@ -49,6 +50,7 @@ namespace AssemblyEngine
             //ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
             ResourceLoader.LoadResource(out Renderable shrekRenderable, "models/shrek/Shrek.obj");
             ResourceLoader.LoadResource(out Renderable donkeyRenderable, "models/donkey/Donkey.obj");
+            ResourceLoader.LoadResource(out Texture2D particlesTex, "textures/gaussian_circle_1.png");
 
             Material shrekMat = new Material(defaultShader);
             Material donkeyMat = new Material(defaultShader);
@@ -87,6 +89,8 @@ namespace AssemblyEngine
             ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
             Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
             plane.transform.position = Vector3.UnitY;
+
+            //ParticleManager.EmitParticles(particlesTex);
 
             //cube = new Cube(tex);
 

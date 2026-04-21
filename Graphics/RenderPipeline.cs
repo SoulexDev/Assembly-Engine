@@ -128,6 +128,7 @@ namespace AssemblyEngine.Graphics
             {
                 renderable.Draw(Camera.main);
             }
+            //sParticleManager.DrawParticles();
 
             if (postEffects.Count > 0)
                 postProcessBuffers.Item1.Unbind();
