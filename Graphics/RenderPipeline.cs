@@ -60,7 +60,7 @@ namespace AssemblyEngine.Graphics
                 ("shaders/internal/post_effect", ShaderType.VertexShader), 
                 ("shaders/internal/gamma_correction_effect", ShaderType.FragmentShader));
 
-            //PushPostEffect(new PostEffect(gammaShader));
+            PushPostEffect(new PostEffect(gammaShader));
 
             ResourceLoader.LoadResource(out shadowShader, 
                 ("shaders/internal/shadow", ShaderType.VertexShader), 
@@ -128,7 +128,7 @@ namespace AssemblyEngine.Graphics
             {
                 renderable.Draw(Camera.main);
             }
-            //sParticleManager.DrawParticles();
+            ParticleManager.DrawParticles();
 
             if (postEffects.Count > 0)
                 postProcessBuffers.Item1.Unbind();

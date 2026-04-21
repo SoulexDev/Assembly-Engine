@@ -7,9 +7,9 @@ namespace AssemblyEngine
         public Transform? parent;
         public List<Transform>? children;
 
-        public Vector3 localPosition;
-        public Quaternion localRotation;
-        public Vector3 localScale;
+        public Vector3 localPosition = Vector3.Zero;
+        public Quaternion localRotation = Quaternion.Identity;
+        public Vector3 localScale = Vector3.One;
         public Vector3 position
         {
             get
