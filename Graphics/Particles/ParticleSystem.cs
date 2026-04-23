@@ -82,8 +82,10 @@ namespace AssemblyEngine.Graphics
 
                 p.textureID = textureID;
                 p.position = ASERandom.InSphere(1);
-                p.velocity = ASERandom.InSphere(1);
+                p.velocity = ASERandom.InSphere(1) * 5;
                 p.color = Color4.Aqua;
+                p.life = ASERandom.Range(minLifeTime, maxLifeTime);
+                p.size = Vector2.One * ASERandom.Range(minSize, maxSize);
 
                 particles[i] = p;
             }
@@ -103,8 +105,9 @@ namespace AssemblyEngine.Graphics
                 if (p.systemID != ID)
                     continue;
 
-                //p.velocity = p.position.Normalized();
-                p.velocity += -p.position * 0.2f;
+                p.life -= Time.deltaTime;
+                //p.size = MathHelper.Lerp(sizeAtStart, sizeAtEnd, p.life /);
+                p.velocity += -p.position * 2 * Time.deltaTime;
                 p.position += p.velocity * Time.deltaTime;
 
                 particles[i] = p;

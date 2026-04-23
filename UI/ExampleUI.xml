@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ASXML
+	xmlns="https://thedevassembly.com"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://thedevassembly.com ASXML.xsd">
+
+	<Group>
+		<layoutType>center</layoutType>
+		<x>0</x>
+		<y>0</y>
+		<width>1920</width>
+		<height>1080</height>
+		<anchor-x>0</anchor-x>
+		<anchor-y>0</anchor-y>
+		<Image assetpath="textures/creepfur.png">
+			<layoutInteraction>ignore</layoutInteraction>
+			<x>20</x>
+			<y>-20</y>
+			<width>100</width>
+			<height>100</height>
+			<anchor-x>0</anchor-x>
+			<anchor-y>1</anchor-y>
+			<color>FF0000FF</color>
+		</Image>
+	</Group>
+</ASXML>

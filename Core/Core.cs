@@ -76,7 +76,7 @@ namespace AssemblyEngine
             shrekRenderable.transform.position = Vector3.UnitX * 0.5f + Vector3.UnitY;
             donkeyRenderable.transform.position = -Vector3.UnitX * 0.5f + Vector3.UnitY;
 
-            donkeyRenderable.transform.SetParent(shrekRenderable.transform, true);
+            //donkeyRenderable.transform.SetParent(shrekRenderable.transform, true);
 
             shrekRenderable.transform.scale = Vector3.One * 0.25f;
             donkeyRenderable.transform.scale = Vector3.One * 0.5f * 0.25f;

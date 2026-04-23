@@ -59,6 +59,8 @@ namespace AssemblyEngine.Graphics
                 modelMatrix *= Matrix4.CreateTranslation(p.position);
 
                 Core.defaultParticleShader.SetMatrix4("uModel", modelMatrix);
+                Core.defaultParticleShader.SetVector("uCenter", p.position);
+                Core.defaultParticleShader.SetVector("uSize", p.size);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
                 lastTexID = p.textureID;

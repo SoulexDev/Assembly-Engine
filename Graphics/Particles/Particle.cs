@@ -13,6 +13,7 @@ namespace AssemblyEngine.Graphics
 
         public Vector3 position;
         public Vector3 velocity;
+        public Vector2 size;
         public Color4 color;
         public float life;
     }

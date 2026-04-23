@@ -122,7 +122,7 @@ namespace AssemblyEngine.Graphics
                 //{
                     
                 //}
-                GL.DeleteTexture(id);
+                //GL.DeleteTexture(id);
                 _disposed = true;
             }
         }
