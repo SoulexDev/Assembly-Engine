@@ -9,14 +9,13 @@ The Assembly Engine is the in-house engine being dveloped by The Dev Assembly. I
 # Features
 * Simple mesh api
 * Resource loading(limited)
-* Very simple shadows
+* Penumbra shadows
 
 It's currently capable enough to create what is present in the game folder(a small WIP voxel demo).
 
 # Plans
 Currently, I am looking to implement these features -
 * Massive shadows
-* Penumbra shadows
 * Voxelized shadows
 * Various lighting methods(npr and pbr models)
 * Volumetric rendering
