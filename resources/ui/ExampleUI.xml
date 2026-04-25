@@ -19,7 +19,7 @@
 			<anchor x="0" y="0"/>
 
 			<layoutInteraction>ignore</layoutInteraction>
-			<layoutType>fill-horizontal</layoutType>
+			<layoutType>center-horizontal</layoutType>
 			<color>#ffffffff</color>
 			
 			<Group id="baby group 1">

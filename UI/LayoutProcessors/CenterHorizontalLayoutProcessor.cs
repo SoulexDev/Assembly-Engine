@@ -32,7 +32,7 @@ namespace AssemblyEngine.UI
 
                 positionX += group.size.x;
 
-                result[i].Item1 = parentPosition + positon;
+                result[i].Item1 = positon;
                 result[i].Item2 = size;
             }
             for (int i = 0; i < groups.Length; i++)
