@@ -6,6 +6,7 @@ namespace AssemblyEngine.UI
     //[XmlType("layoutType", Namespace = "https://thedevassembly.com")]
     public enum LayoutType
     {
+        [XmlEnum("none")] None,
         [XmlEnum("inherit")] Inherit,
         [XmlEnum("center-horizontal")] CenterHorizontal,
         [XmlEnum("center-vertical")] CenterVertical,

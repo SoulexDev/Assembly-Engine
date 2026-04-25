@@ -5,27 +5,53 @@
 	xsi:schemaLocation="https://thedevassembly.com ASXML.xsd">
 
 	<Group id="root group">
-		<RectTransform>
-			<position x="0" y="0"/>
-			<size x="1920" y="1080"/>
-			<anchor x="0" y="0"/>
-		</RectTransform>
+		<position x="0" y="0"/>
+		<size x="1920" y="1080"/>
+		<anchor x="0" y="0"/>
 		
 		<layoutInteraction>ignore</layoutInteraction>
-		<layoutType>center-horizontal</layoutType>
+		<layoutType>none</layoutType>
 		<color>#ffffffff</color>
-		
-		<Group id="baby group 1">
-			<RectTransform>
-				<position x="960" y="540"/>
-				<size x="10" y="10"/>
-				<anchor x="0.5" y="0.5"/>
-			</RectTransform>
-			
+
+		<Group id="test group">
+			<position x="400" y="400"/>
+			<size x="250" y="100"/>
+			<anchor x="0" y="0"/>
+
 			<layoutInteraction>ignore</layoutInteraction>
-			<layoutType>inherit</layoutType>
+			<layoutType>fill-horizontal</layoutType>
 			<color>#ffffffff</color>
-			<image>textures/brick_medieval.jpg</image>
+			
+			<Group id="baby group 1">
+				<position x="960" y="540"/>
+				<size x="200" y="200"/>
+				<anchor x="0.5" y="0.5"/>
+
+				<layoutInteraction>ignore</layoutInteraction>
+				<layoutType>inherit</layoutType>
+				<color>#ffffffff</color>
+				<image>textures/brick_medieval.jpg</image>
+			</Group>
+			<Group id="baby group 2">
+				<position x="960" y="540"/>
+				<size x="200" y="125"/>
+				<anchor x="0.5" y="0.5"/>
+
+				<layoutInteraction>ignore</layoutInteraction>
+				<layoutType>inherit</layoutType>
+				<color>#ffffffff</color>
+				<image>textures/Prototype_Dark.png</image>
+			</Group>
+			<Group id="baby group 3">
+				<position x="960" y="540"/>
+				<size x="50" y="250"/>
+				<anchor x="0.5" y="0.5"/>
+
+				<layoutInteraction>ignore</layoutInteraction>
+				<layoutType>inherit</layoutType>
+				<color>#ffffffff</color>
+				<image>textures/grass_seamless.jpg</image>
+			</Group>
 		</Group>
 	</Group>
 </ASXML>

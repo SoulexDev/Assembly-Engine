@@ -11,8 +11,14 @@ namespace AssemblyEngine.UI
         [XmlAttribute("id")]
         public string id;
 
-        [XmlElement("RectTransform")]
-        public RectTransform rectTransform;
+        [XmlElement("position")]
+        public UIVector2I position;
+
+        [XmlElement("size")]
+        public UIVector2I size;
+
+        [XmlElement("anchor")]
+        public UIVector2 anchor;
 
         [XmlElement("layoutInteraction")]
         public LayoutInteraction layoutInteraction;
@@ -64,12 +70,14 @@ namespace AssemblyEngine.UI
         public Texture2D texture;
 
         [XmlElement("Group")]
-        public List<Group> childGroups = new List<Group>();
+        public List<Group> children = new List<Group>();
 
         public Group() { }
         public Group(UIVector2I position, UIVector2I size, UIVector2 anchor)
         {
-            rectTransform = new RectTransform() { position = position, size = size, anchor = anchor };
+            this.position = position;
+            this.size = size;
+            this.anchor = anchor;
         }
     }
 }

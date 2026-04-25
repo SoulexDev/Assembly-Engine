@@ -80,17 +80,49 @@ namespace AssemblyEngine.UI
 
             GL.BindVertexArray(FullscreenQuadMesh.mesh.vao);
 
-            foreach (Group rootGroup in rootGroups)
-            {
-                RecursiveDrawGroup(rootGroup, canvasRect, 0);
-            }
+            LayoutAndDrawGroups(LayoutType.None, rootGroups.ToArray(), Vector2.Zero, new Vector2(1920, 1080));
 
             GL.BindVertexArray(0);
             GL.Disable(EnableCap.Blend);
         }
+        //draw group
+        //layout group children
+        //recurse with group, child group, and transformed layout
+
+        private void LayoutAndDrawGroups(LayoutType layoutType, Group[] groups, Vector2 parentPositionT, Vector2 parentSizeT)
+        {
+            if (groups.Length == 0)
+                return;
+
+            ILayoutProcessor layoutProcessor = LayoutDictionary.layoutProcessors[layoutType];
+            (Vector2, Vector2)[] layoutResult = layoutProcessor.ProcessLayout(parentPositionT, parentSizeT, groups);
+
+            for (int i = 0; i < groups.Length; i++)
+            {
+                Group group = groups[i];
+
+                if (!string.IsNullOrEmpty(group.imagePath))
+                {
+                    Core.defaultUIShader.SetVector("uPosition", layoutResult[i].Item1);
+                    Core.defaultUIShader.SetVector("uSize", layoutResult[i].Item2);
+                    Core.defaultUIShader.SetColor("uColor", group.color);
+
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, group.texture);
+                    Core.defaultUIShader.SetTexture("uMainTex", 0);
+
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                }
+
+                LayoutType nextLayout = group.layoutType == LayoutType.Inherit ? layoutType : group.layoutType;
+
+                LayoutAndDrawGroups(nextLayout, group.children.ToArray(), layoutResult[i].Item1, layoutResult[i].Item2);
+            }
+        }
         private void RecursiveDrawGroup(Group group, RectTransform transformedParentRect, int index)
         {
-            RectTransform transformedRect = GetTransformedChildRect(index, LayoutType.Inherit, group.layoutInteraction, transformedParentRect, group.rectTransform);
+            RectTransform transformedRect = GetTransformedChildRect(index, LayoutType.Inherit, group.layoutInteraction, null, group);
 
             if (!string.IsNullOrEmpty(group.imagePath))
             {
@@ -107,21 +139,13 @@ namespace AssemblyEngine.UI
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
 
-            float centerX = 0;
-            float widthX = 0;
-
-            for (int i = 0; i < group.childGroups.Count; i++)
-            {
-                Group childGroup = group.childGroups[i];
-                if (group.layoutType == LayoutType.CenterHorizontal)
-                {
-                    widthX += childGroup.rectTransform.size.x;
-                }
+            //for (int i = 0; i < group.childGroups.Count; i++)
+            //{
+            //    Group childGroup = group.childGroups[i];
                 //RecursiveDrawGroup(group.childGroups[i], transformedRect, i);
-            }
-            centerX = widthX / group.childGroups.Count;
+            //}
         }
-        private RectTransform GetTransformedChildRect(int index, LayoutType layoutType, LayoutInteraction layoutInteraction, RectTransform parent, RectTransform child)
+        private RectTransform GetTransformedChildRect(int index, LayoutType layoutType, LayoutInteraction layoutInteraction, Group parent, Group child)
         {
             RectTransform returnRect = new RectTransform();
 

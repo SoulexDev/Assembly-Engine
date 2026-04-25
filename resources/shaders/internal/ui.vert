@@ -7,7 +7,7 @@ out vec2 uv;
 uniform vec2 uCanvasSize;
 uniform vec2 uPosition;
 uniform vec2 uSize;
-uniform vec2 uAnchor;
+//uniform vec2 uAnchor;
 
 void main(){
 	vec2 scale = uSize / uCanvasSize;
