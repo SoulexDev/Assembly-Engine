@@ -1,5 +1,19 @@
 ![Assembly Engine Logo](/git_assets/AssemblyEngineLogo.png)
 
+### License
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL_3.0-orange)](https://github.com/SoulexDev/Assembly-Engine/blob/main/LICENSE)
+
+### Dependencies
+[![NuGet](https://img.shields.io/badge/AssimpNet-v4.1.0-blue)](https://www.nuget.org/packages/AssimpNet)
+[![NuGet](https://img.shields.io/badge/ImGui.NET-v1.91.6.1-blue)](https://www.nuget.org/packages/ImGui.NET/)
+[![NuGet](https://img.shields.io/badge/JoltPhysicsSharp-v2.21.0-blue)](https://www.nuget.org/packages/JoltPhysicsSharp)
+[![NuGet](https://img.shields.io/badge/OpenTK.Compute-v4.9.4-blue)](https://www.nuget.org/packages/OpenTK.Compute/)
+[![NuGet](https://img.shields.io/badge/OpenTK.Core-v4.9.4-blue)](https://www.nuget.org/packages/OpenTK.Core/)
+[![NuGet](https://img.shields.io/badge/OpenTK.Graphics-v4.9.4-blue)](https://www.nuget.org/packages/OpenTK.Graphics/)
+[![NuGet](https://img.shields.io/badge/OpenTK.Mathematics-v4.9.4-blue)](https://www.nuget.org/packages/OpenTK.Mathematics/)
+[![NuGet](https://img.shields.io/badge/SpaceWizards.Sdl-v1.1.1-blue)](https://www.nuget.org/packages/SpaceWizards.Sdl)
+[![NuGet](https://img.shields.io/badge/StbImageSharp-v2.30.15-blue)](https://www.nuget.org/packages/StbImageSharp/)
+
 ## About
 The Assembly Engine is the in-house engine being dveloped by The Dev Assembly. It is a lightweight, code based game engine. It is designed for performance, ease of use, and freedom, without the hassle of doing absolutely everything yourself.
 
