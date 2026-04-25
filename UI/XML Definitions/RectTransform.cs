@@ -2,16 +2,19 @@
 
 namespace AssemblyEngine.UI
 {
-    [XmlType("RectTransform")]
+    [Serializable]
+    [XmlType(Namespace = "https://thedevassembly.com")]
     public class RectTransform
     {
         [XmlElement("position")]
-        public UIVector2 position;
+        public UIVector2I position;
 
         [XmlElement("size")]
-        public UIVector2 size;
+        public UIVector2I size;
 
         [XmlElement("anchor")]
         public UIVector2 anchor;
+
+        public RectTransform() { }
     }
 }

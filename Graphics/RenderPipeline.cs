@@ -61,7 +61,7 @@ namespace AssemblyEngine.Graphics
                 ("shaders/internal/gamma_correction_effect", ShaderType.FragmentShader));
 
             PushPostEffect(new PostEffect(gammaShader));
-
+            
             ResourceLoader.LoadResource(out shadowShader, 
                 ("shaders/internal/shadow", ShaderType.VertexShader), 
                 ("shaders/internal/shadow", ShaderType.FragmentShader));
@@ -128,16 +128,22 @@ namespace AssemblyEngine.Graphics
             {
                 renderable.Draw(Camera.main);
             }
+
+            //render particles
             ParticleManager.DrawParticles();
 
-            if (postEffects.Count > 0)
-                postProcessBuffers.Item1.Unbind();
-
-            //disable depth testing for post processing
+            //disable depth testing for rendering ui and post effects
             GL.Disable(EnableCap.DepthTest);
 
+            //render post effects
             if (postEffects.Count > 0)
+            {
+                postProcessBuffers.Item1.Unbind();
                 PostProcess();
+            }
+
+            //render ui
+            Core.canvas.Draw();
 
             SDL_GL_SwapWindow(window);
         }

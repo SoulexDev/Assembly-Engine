@@ -4,23 +4,28 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://thedevassembly.com ASXML.xsd">
 
-	<Group>
-		<layoutType>center</layoutType>
-		<x>0</x>
-		<y>0</y>
-		<width>1920</width>
-		<height>1080</height>
-		<anchor-x>0</anchor-x>
-		<anchor-y>0</anchor-y>
-		<Image assetpath="textures/creepfur.png">
+	<Group id="root group">
+		<RectTransform>
+			<position x="0" y="0"/>
+			<size x="1920" y="1080"/>
+			<anchor x="0" y="0"/>
+		</RectTransform>
+		
+		<layoutInteraction>ignore</layoutInteraction>
+		<layoutType>center-horizontal</layoutType>
+		<color>#ffffffff</color>
+		
+		<Group id="baby group 1">
+			<RectTransform>
+				<position x="960" y="540"/>
+				<size x="10" y="10"/>
+				<anchor x="0.5" y="0.5"/>
+			</RectTransform>
+			
 			<layoutInteraction>ignore</layoutInteraction>
-			<x>20</x>
-			<y>-20</y>
-			<width>100</width>
-			<height>100</height>
-			<anchor-x>0</anchor-x>
-			<anchor-y>1</anchor-y>
-			<color>FF0000FF</color>
-		</Image>
+			<layoutType>inherit</layoutType>
+			<color>#ffffffff</color>
+			<image>textures/brick_medieval.jpg</image>
+		</Group>
 	</Group>
 </ASXML>

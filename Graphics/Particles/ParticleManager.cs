@@ -28,6 +28,9 @@ namespace AssemblyEngine.Graphics
         }
         public static void UpdateParticles()
         {
+            if (particleSystems.Count == 0)
+                return;
+
             foreach (ParticleSystem system in particleSystems)
             {
                 system.UpdateParticles(particlePool);

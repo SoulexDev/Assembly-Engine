@@ -59,6 +59,10 @@ namespace AssemblyEngine.Graphics
         {
             SetInt(name, value);
         }
+        public void SetColor(string name, Color4 value)
+        {
+            SetVector(name, (Vector4)value);
+        }
         public static bool CreateShaderProgram(out int id, params (string, ShaderType)[] shaderInfo)
         {
             id = 0;

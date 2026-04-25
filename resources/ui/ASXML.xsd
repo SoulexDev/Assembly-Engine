@@ -8,17 +8,27 @@
 	<xs:element name="text" type="xs:string"/>
 	<xs:element name="layoutType" type="xs:string"/>
 	<xs:element name="layoutInteraction" type="xs:string"/>
-	<xs:element name="anchor-x" type="xs:decimal"/>
-	<xs:element name="anchor-y" type="xs:decimal"/>
-	<xs:element name="color" type="xs:hexBinary" default="FFFFFFFF"/>
+	<xs:element name="color" type="xs:string" default="#ffffffff"/>
+	<xs:element name="image" type="xs:string"/>
 	
 	<!-- complex elements -->
 	<xs:element name="ASXML" type="ASXML"/>
 	<xs:element name="Group" type="Group"/>
-	<xs:element name="Image" type="Image"/>
+	<!--<xs:element name="Image" type="Image"/>-->
 	<xs:element name="RectTransform" type="RectTransform"/>
-	<xs:element name="Vector" type="Vector"/>
+	<xs:element name="Vector2" type="Vector2"/>
 	
+	<!-- attribute groups -->
+	<xs:attributeGroup name="integer-2">
+		<xs:attribute name="x" type="xs:integer" />
+		<xs:attribute name="y" type="xs:integer"/>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="decimal-2">
+		<xs:attribute name="x" type="xs:decimal" />
+		<xs:attribute name="y" type="xs:decimal"/>
+	</xs:attributeGroup>
+
 	<!-- simple element definitions -->
 	<xs:simpleType name="layoutType">
 		<xs:restriction base="xs:string">
@@ -59,61 +69,48 @@
 			<xs:enumeration value="ignore"/>
 		</xs:restriction>
 	</xs:simpleType>
-	
-	<xs:simpleType name="anchor-x">
-		<xs:restriction base="xs:decimal">
-			<xs:minInclusive value="0"/>
-			<xs:maxInclusive value="1"/>
-		</xs:restriction>
-	</xs:simpleType>
-	
-	<xs:simpleType name="anchor-y">
-		<xs:restriction base="xs:decimal">
-			<xs:minInclusive value="0"/>
-			<xs:maxInclusive value="1"/>
+
+	<xs:simpleType name="color">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[#][0-9a-fA-F]{9}"/>
+			<xs:minLength value="9"/>
+			<xs:maxLength value="9"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
 	<!-- complex element definitions -->
 	<xs:complexType name="ASXML">
 		<xs:sequence>
-			<xs:element name="Group" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="Group" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="Group">
 		<xs:sequence>
 			<xs:element ref="RectTransform" minOccurs="1" maxOccurs="1"/>
+			<xs:element ref="layoutInteraction" minOccurs="1" maxOccurs="1"/>
 			<xs:element ref="layoutType" minOccurs="1" maxOccurs="1"/>
 			<xs:element ref="color" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="image" minOccurs="0" maxOccurs="1"/>
 			<xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element ref="Image" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
 	
-	<xs:complexType name="Image">
-		<xs:sequence>
-			<xs:element ref="RectTransform" minOccurs="1" maxOccurs="1"/>
-			<xs:element ref="layoutInteraction" minOccurs="1" maxOccurs="1"/>
-			<xs:element ref="color" minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
-		<xs:attribute name="assetpath" type="xs:string" use="optional"/>
-	</xs:complexType>
-	
 	<xs:complexType name="RectTransform">
 		<xs:sequence>
-			<xs:element name="position" type="Vector2"/>
-			<xs:element name="size" type="Vector2"/>
+			<xs:element name="position" type="Vector2I"/>
+			<xs:element name="size" type="Vector2I"/>
 			<xs:element name="anchor" type="Vector2"/>
 		</xs:sequence>
 	</xs:complexType>
 	
+	<xs:complexType name="Vector2I">
+		<xs:attributeGroup ref="integer-2"/>
+	</xs:complexType>
+
 	<xs:complexType name="Vector2">
-		<xs:sequence>
-			<xs:element name="x" type="xs:integer" />
-			<xs:element name="y" type="xs:integer"/>
-		</xs:sequence>
+		<xs:attributeGroup ref="decimal-2"/>
 	</xs:complexType>
 	
 </xs:schema>

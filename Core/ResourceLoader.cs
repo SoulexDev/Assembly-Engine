@@ -1,4 +1,5 @@
 ﻿using AssemblyEngine.Graphics;
+using Assimp.Unmanaged;
 using OpenTK.Graphics.OpenGL4;
 
 namespace AssemblyEngine
@@ -21,20 +22,35 @@ namespace AssemblyEngine
             { Assimp.TextureWrapMode.Clamp, TextureWrapMode.ClampToBorder },
             { Assimp.TextureWrapMode.Decal, TextureWrapMode.ClampToBorder },
         };
+        
         private static Assimp.AssimpContext importer = new Assimp.AssimpContext();
+
+        //resources
+        private static Dictionary<string, Texture2D> textureResources = new Dictionary<string, Texture2D>();
+        //private static Dictionary<(string, ShaderType)[], Shader> shaderResources = new Dictionary<(string, ShaderType)[], Shader>();
 
         public static bool LoadResource(out Texture2D texture, string filePath)
         {
+            if (textureResources.TryGetValue(filePath, out texture))
+                return true;
+
+            string preProcessFilePath = filePath;
             filePath = Path.Combine(Core.AssetsPath, filePath);
 
             Console.WriteLine("Loading texture " + filePath);
 
             texture = new Texture2D(filePath);
 
+            if (!textureResources.ContainsKey(preProcessFilePath))
+                textureResources.Add(preProcessFilePath, texture);
+
             return true;
         }
         public static bool LoadResource(out Shader shader, params (string, ShaderType)[] fileInfo)
         {
+            //if (shaderResources.TryGetValue(fileInfo, out shader))
+            //    return true;
+
             Console.WriteLine("Loading shader " + Path.Combine(Core.AssetsPath, fileInfo[0].Item1));
 
             (string, ShaderType)[] shaderInfo = new (string, ShaderType)[fileInfo.Length];

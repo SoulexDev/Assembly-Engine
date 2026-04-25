@@ -2,24 +2,23 @@
 using AssemblyEngine.Graphics;
 using AssemblyEngine.Graphics.Testing;
 using AssemblyEngine.Testing;
+using AssemblyEngine.UI;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using static SDL3.SDL;
-
-//using var sdl = new Sdl(static builder => builder.SetAppName("Assembly Engine").InitializeSubSystems(SubSystems.Video | SubSystems.Audio));
-
-//return sdl.Run(new Core(), args);
 
 namespace AssemblyEngine
 {
     public class Core
     {
         public static string AssetsPath;
-        private static Cube cube;
         private static FreeCam freecam;
 
         public static Shader defaultShader;
         public static Shader defaultParticleShader;
+        public static Shader defaultUIShader;
+
+        public static ASXMLCanvas canvas;
         //private static Transform shrekT;
 
         public static void Main(string[] args)
@@ -51,53 +50,35 @@ namespace AssemblyEngine
                 ("shaders/internal/particle_unlit", ShaderType.VertexShader),
                 ("shaders/internal/particle_unlit", ShaderType.FragmentShader));
 
-            //load stuff
-            //ResourceLoader.LoadResource(out Renderable renderable, "models/guitartypeshi.fbx");
-            ResourceLoader.LoadResource(out Renderable shrekRenderable, "models/shrek/Shrek.obj");
-            ResourceLoader.LoadResource(out Renderable donkeyRenderable, "models/donkey/Donkey.obj");
-
-            Material shrekMat = new Material(defaultShader);
-            Material donkeyMat = new Material(defaultShader);
-
-            if (ResourceLoader.LoadResource(out Texture2D shrekAlbedo, "models/shrek/t_shrek_c.png"))
-            {
-                shrekMat.texture2Ds.Add(("uMainTex", shrekAlbedo));
-            }
-            if (ResourceLoader.LoadResource(out Texture2D donkeyAlbedo, "models/donkey/t_Donkey_c.png"))
-            {
-                donkeyMat.texture2Ds.Add(("uMainTex", donkeyAlbedo));
-            }
-
-            //shrekT = shrekRenderable.transform;
-
-            shrekRenderable.SetMaterial(shrekMat);
-            donkeyRenderable.SetMaterial(donkeyMat);
-
-            shrekRenderable.transform.position = Vector3.UnitX * 0.5f + Vector3.UnitY;
-            donkeyRenderable.transform.position = -Vector3.UnitX * 0.5f + Vector3.UnitY;
-
-            //donkeyRenderable.transform.SetParent(shrekRenderable.transform, true);
-
-            shrekRenderable.transform.scale = Vector3.One * 0.25f;
-            donkeyRenderable.transform.scale = Vector3.One * 0.5f * 0.25f;
-
-            //ResourceLoader.LoadResource(out Texture2D guitarTex, "models/1001_albedo.jpg");
-            //mat.texture2Ds.Add(("uMainTex", guitarTex));
-            //renderable.SetMaterial(mat);
-
-            //renderable.transform.Rotate(Vector3.UnitX, -90);
+            ResourceLoader.LoadResource(out defaultUIShader,
+                ("shaders/internal/ui", ShaderType.VertexShader),
+                ("shaders/internal/ui", ShaderType.FragmentShader));
 
             freecam = new FreeCam(Camera.main);
 
-            //ResourceLoader.LoadResource(out Texture2D planeTex, "textures/tex_atlas.png");
-            //ResourceLoader.LoadResource(out Texture2D tex, "textures/tex_atlas.png");
-            //Plane plane = PlaneGenerator.Generate(tex, PrimitiveType.Triangles, 10, 10);
-            //plane.transform.position = Vector3.UnitY * -1;
-
+            ResourceLoader.LoadResource(out Texture2D checkerDark, "textures/Prototype_Dark.png");
+            ResourceLoader.LoadResource(out Texture2D checkerLight, "textures/Prototype_Light.png");
             ResourceLoader.LoadResource(out Texture2D particlesTex, "textures/gaussian_circle_1.png");
-            ParticleManager.EmitParticles(particlesTex);
+            ResourceLoader.LoadResource(out Texture2D guitarTex, "models/1001_albedo.jpg");
 
-            //cube = new Cube(tex);
+            Plane plane = PlaneGenerator.Generate(checkerLight, PrimitiveType.Triangles, 25, 25, 100);
+            plane.transform.scale = Vector3.One * 4;
+
+            ResourceLoader.LoadResource(out Renderable guitar, "models/guitartypeshi.fbx");
+            guitar.transform.position = Vector3.UnitY * 4;
+
+            Material guitarMat = new Material(defaultShader);
+            guitarMat.texture2Ds.Add(("uMainTex", guitarTex));
+
+            guitar.SetMaterial(guitarMat);
+
+            Cube cube = new Cube(checkerDark);
+            cube.transform.position = Vector3.UnitX * 4;
+            cube.transform.scale = new Vector3(2, 40, 2);
+
+            //ParticleManager.EmitParticles(particlesTex);
+
+            canvas = ASXMLCanvas.LoadFromXML("ui/ExampleUI.xml");
 
             return SDL_AppResult.SDL_APP_CONTINUE;
         };

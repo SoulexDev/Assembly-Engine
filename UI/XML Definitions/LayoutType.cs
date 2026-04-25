@@ -2,6 +2,8 @@
 
 namespace AssemblyEngine.UI
 {
+    //[Serializable]
+    //[XmlType("layoutType", Namespace = "https://thedevassembly.com")]
     public enum LayoutType
     {
         [XmlEnum("inherit")] Inherit,

@@ -19,7 +19,7 @@ namespace AssemblyEngine.Graphics.Testing
             new Vector3(0.0f, 0.0f, 1.0f), //top left - 2[1, 4] 2
             new Vector3(1.0f, 0.0f, 1.0f)  //top right - 3[5] 3
         };
-        public static Plane Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10)
+        public static Plane Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10, float uvScale = 1)
         {
             ResourceLoader.LoadResource(out Shader shader, 
                 ("shaders/internal/simple_lit", ShaderType.VertexShader), 
@@ -54,8 +54,8 @@ namespace AssemblyEngine.Graphics.Testing
                         vertices.Add(0.0f);
 
                         //uvs
-                        vertices.Add((float)(x + uv.X) / (float)widthX);
-                        vertices.Add((float)(z + uv.Y) / (float)widthZ);
+                        vertices.Add((float)(x + uv.X) / (float)widthX * uvScale);
+                        vertices.Add((float)(z + uv.Y) / (float)widthZ * uvScale);
                         //vertices.Add(x + vert.X);
                         //vertices.Add(z + vert.Z);
                         //Console.WriteLine(new Vector2((float)(x + uv.X) / (float)widthX, (float)(z + uv.Y) / (float)widthZ));

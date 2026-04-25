@@ -28,36 +28,25 @@ float interleaved_gradient_noise(vec2 screenPos){
 	vec3 magic = vec3(0.06711056, 0.00583715, 52.9829189);
 	return fract(magic.z * fract(dot(screenPos, magic.xy)));
 }
-float avg_blockers_depth_to_penumbra(float lightSize, float testingZ, float avgBlockerDepth){
-	return lightSize * (testingZ - avgBlockerDepth) / avgBlockerDepth;
-}
-float penumbra(float gradientNoise, vec2 sampleCenter, float testingZ, int sampleCount){
-	float avgBlockerDepth = 0.0;
-	float blockerCount = 0.0;
-
-	for (int i = 0; i < sampleCount; i++){
-		vec2 samplePoint = vogel_disk_sample(i, sampleCount, gradientNoise);
-		samplePoint = sampleCenter + samplePoint * 0.05;
-
-		float depth = texture(uShadowTex0, samplePoint).r;
-
-		if (depth < testingZ){
-			avgBlockerDepth += depth;
-			blockerCount += 1.0;
-		}
-	}
-
-	if (blockerCount > 0.0){
-		avgBlockerDepth /= blockerCount;
-		return avg_blockers_depth_to_penumbra(10.0, testingZ, avgBlockerDepth);
-	}
-	else{
-		return 0.25;
-	}
-}
 vec2 to_pixel_point(vec2 point, float texels){
 	float r = 1.0 / texels;
 	return floor(point * texels) * r + r * 0.5;
+}
+float get_blocker_dist(float gradientNoise, vec2 uv, float zReciever, int sampleCount){
+	float dist = 0;
+	int blockerCount = 0;
+	float texelSize = 1.0 / 2048.0;
+	for	(int i = 0; i < sampleCount; i++){
+		vec2 samplePoint = uv + vogel_disk_sample(i, sampleCount, gradientNoise) * texelSize * 16;
+		float depth = texture(uShadowTex0, samplePoint).r;
+
+		if (zReciever > depth){
+			blockerCount++;
+			dist += depth;
+		}
+	}
+
+	return dist / float(blockerCount);
 }
 float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 	vec3 projCoords = lightSpaceFragPos.xyz / lightSpaceFragPos.w;
@@ -73,21 +62,22 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 	float texelSize = 1.0 / 2048.0;
 	
 	float noise = fract(gl_FragCoord.x + gl_FragCoord.y) + interleaved_gradient_noise(gl_FragCoord.xy * gl_FragCoord.yx);
-	//float p = penumbra(noise, projCoords.xy, texture(uShadowTex0, projCoords.xy).r, sampleCount / 2);
+	float d = fragDepth - bias;
+	float p = get_blocker_dist(noise, projCoords.xy, d, sampleCount);
+	p = ((d - p) / p) * 32;
+	p = max(p, 2.0);
 
 	float shadow = 0.0;
     for (int i = 0; i < sampleCount; i++)
     {
-		vec2 samplePoint = projCoords.xy + vogel_disk_sample(i, sampleCount, uTime / max(noise, 0.01)) * texelSize * 4;
+		vec2 samplePoint = projCoords.xy + vogel_disk_sample(i, sampleCount, uTime / max(noise, 0.01)) * texelSize * p;
         
 		float lightDepthPoint = texture(uShadowTex0, to_pixel_point(samplePoint, 2048.0)).r;
 		float lightDepthLinear = texture(uShadowTex0, samplePoint).r;
 		float lightDepth = max(lightDepthPoint, lightDepthLinear);
 
-		shadow += fragDepth - bias * 2 > lightDepth ? 0.0 : 1.0;
+		shadow += fragDepth - bias * p * 0.5 > lightDepth ? 0.0 : 1.0;
     }
-
-	//if the depth of the geometry, relative to the sun, is larger than the depth from the sun to the nearest visible point
 	return shadow / float(sampleCount);
 }
 

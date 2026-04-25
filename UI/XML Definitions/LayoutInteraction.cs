@@ -2,6 +2,8 @@
 
 namespace AssemblyEngine.UI
 {
+    //[Serializable]
+    //[XmlType("layoutInteraction", Namespace = "https://thedevassembly.com")]
     public enum LayoutInteraction
     {
         [XmlEnum("fit")] Fit,

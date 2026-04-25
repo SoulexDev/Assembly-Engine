@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <AssemblyTitle>ASE</AssemblyTitle>
     <ApplicationIcon>ase.ico</ApplicationIcon>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -35,6 +35,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Graphics\Particles\EmitterShapes\" />
+	  <Folder Include="resources\textures\ui\" />
 	</ItemGroup>
 
 </Project>
