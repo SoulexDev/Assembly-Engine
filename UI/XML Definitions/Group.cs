@@ -12,13 +12,19 @@ namespace AssemblyEngine.UI
         public string id;
 
         [XmlElement("position")]
-        public UIVector2I position;
+        public UIVector2I internalPosition;
 
         [XmlElement("size")]
-        public UIVector2I size;
+        public UIVector2I internalSize;
 
         [XmlElement("anchor")]
-        public UIVector2 anchor;
+        public UIVector2 internalAnchor;
+
+        [XmlIgnore]
+        public Vector2i position;
+
+        [XmlIgnore]
+        public Vector2i size;
 
         [XmlElement("layoutInteraction")]
         public LayoutInteraction layoutInteraction;
@@ -75,9 +81,9 @@ namespace AssemblyEngine.UI
         public Group() { }
         public Group(UIVector2I position, UIVector2I size, UIVector2 anchor)
         {
-            this.position = position;
-            this.size = size;
-            this.anchor = anchor;
+            this.internalPosition = position;
+            this.internalSize = size;
+            this.internalAnchor = anchor;
         }
     }
 }

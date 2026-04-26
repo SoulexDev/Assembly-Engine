@@ -12,19 +12,18 @@ namespace AssemblyEngine.UI
     public class ASXMLCanvas
     {
         [XmlIgnore]
-        public RectTransform canvasRect;
+        private bool isDirty = true;
+
+        [XmlIgnore]
+        public Vector2 canvasSize;
 
         [XmlElement("Group")]
         public List<Group> rootGroups = new List<Group>();
 
         public ASXMLCanvas()
         {
-            canvasRect = new RectTransform()
-            {
-                position = new UIVector2I(0, 0),
-                size = new UIVector2I(1920, 1080),
-                anchor = new UIVector2(0, 0)
-            };
+            canvasSize = new Vector2(1920, 1080);
+            isDirty = true;
         }
         public static ASXMLCanvas LoadFromXML(string xmlPath)
         {
@@ -70,17 +69,29 @@ namespace AssemblyEngine.UI
 
             Console.WriteLine(args.Message);
         }
+        public void SetDirty()
+        {
+            isDirty = true;
+        }
         public void Draw()
         {
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             Core.defaultUIShader.Use();
-            Core.defaultUIShader.SetVector("uCanvasSize", (Vector2i)canvasRect.size);
+            Core.defaultUIShader.SetVector("uCanvasSize", (Vector2i)canvasSize);
 
             GL.BindVertexArray(FullscreenQuadMesh.mesh.vao);
 
-            LayoutAndDrawGroups(LayoutType.None, rootGroups.ToArray(), Vector2.Zero, new Vector2(1920, 1080));
+            Group[] groups = rootGroups.ToArray();
+
+            if (isDirty)
+            {
+                LayoutGroups(groups, LayoutType.None, Vector2.Zero, canvasSize);
+                isDirty = false;
+            }
+
+            DrawGroups(groups);
 
             GL.BindVertexArray(0);
             GL.Disable(EnableCap.Blend);
@@ -89,22 +100,32 @@ namespace AssemblyEngine.UI
         //layout group children
         //recurse with group, child group, and transformed layout
 
-        private void LayoutAndDrawGroups(LayoutType layoutType, Group[] groups, Vector2 parentPositionT, Vector2 parentSizeT)
+        //TODO: create dirty feature, only rebuilding the layout when necessary
+        private void LayoutGroups(Group[] groups, LayoutType layoutType, Vector2 parentPositionT, Vector2 parentSizeT)
         {
             if (groups.Length == 0)
                 return;
 
             ILayoutProcessor layoutProcessor = LayoutDictionary.layoutProcessors[layoutType];
-            (Vector2, Vector2)[] layoutResult = layoutProcessor.ProcessLayout(parentPositionT, parentSizeT, groups);
+            layoutProcessor.ProcessLayout(parentPositionT, parentSizeT, groups);
 
             for (int i = 0; i < groups.Length; i++)
             {
                 Group group = groups[i];
 
+                LayoutType nextLayout = group.layoutType == LayoutType.Inherit ? layoutType : group.layoutType;
+
+                LayoutGroups(group.children.ToArray(), nextLayout, group.position, group.size);
+            }
+        }
+        private void DrawGroups(Group[] groups)
+        {
+            foreach (Group group in groups)
+            {
                 if (!string.IsNullOrEmpty(group.imagePath))
                 {
-                    Core.defaultUIShader.SetVector("uPosition", layoutResult[i].Item1);
-                    Core.defaultUIShader.SetVector("uSize", layoutResult[i].Item2);
+                    Core.defaultUIShader.SetVector("uPosition", group.position);
+                    Core.defaultUIShader.SetVector("uSize", group.size);
                     Core.defaultUIShader.SetColor("uColor", group.color);
 
                     GL.ActiveTexture(TextureUnit.Texture0);
@@ -115,66 +136,40 @@ namespace AssemblyEngine.UI
                     GL.BindTexture(TextureTarget.Texture2D, 0);
                 }
 
-                LayoutType nextLayout = group.layoutType == LayoutType.Inherit ? layoutType : group.layoutType;
-
-                LayoutAndDrawGroups(nextLayout, group.children.ToArray(), layoutResult[i].Item1, layoutResult[i].Item2);
+                DrawGroups(group.children.ToArray());
             }
         }
-        private void RecursiveDrawGroup(Group group, RectTransform transformedParentRect, int index)
-        {
-            RectTransform transformedRect = GetTransformedChildRect(index, LayoutType.Inherit, group.layoutInteraction, null, group);
+        //private void LayoutAndDrawGroups(LayoutType layoutType, Group[] groups, Vector2 parentPositionT, Vector2 parentSizeT)
+        //{
+        //    if (groups.Length == 0)
+        //        return;
 
-            if (!string.IsNullOrEmpty(group.imagePath))
-            {
-                Core.defaultUIShader.SetVector("uPosition", (Vector2i)transformedRect.position);
-                Core.defaultUIShader.SetVector("uSize", (Vector2i)transformedRect.size);
-                Core.defaultUIShader.SetVector("uAnchor", (Vector2i)transformedRect.anchor);
-                Core.defaultUIShader.SetColor("uColor", group.color);
+        //    ILayoutProcessor layoutProcessor = LayoutDictionary.layoutProcessors[layoutType];
+        //    (Vector2, Vector2)[] layoutResult = layoutProcessor.ProcessLayout(parentPositionT, parentSizeT, groups);
 
-                GL.ActiveTexture(TextureUnit.Texture0);
-                GL.BindTexture(TextureTarget.Texture2D, group.texture);
-                Core.defaultUIShader.SetTexture("uMainTex", 0);
+        //    for (int i = 0; i < groups.Length; i++)
+        //    {
+        //        Group group = groups[i];
 
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-            }
+        //        if (!string.IsNullOrEmpty(group.imagePath))
+        //        {
+        //            Core.defaultUIShader.SetVector("uPosition", layoutResult[i].Item1);
+        //            Core.defaultUIShader.SetVector("uSize", layoutResult[i].Item2);
+        //            Core.defaultUIShader.SetColor("uColor", group.color);
 
-            //for (int i = 0; i < group.childGroups.Count; i++)
-            //{
-            //    Group childGroup = group.childGroups[i];
-                //RecursiveDrawGroup(group.childGroups[i], transformedRect, i);
-            //}
-        }
-        private RectTransform GetTransformedChildRect(int index, LayoutType layoutType, LayoutInteraction layoutInteraction, Group parent, Group child)
-        {
-            RectTransform returnRect = new RectTransform();
+        //            GL.ActiveTexture(TextureUnit.Texture0);
+        //            GL.BindTexture(TextureTarget.Texture2D, group.texture);
+        //            Core.defaultUIShader.SetTexture("uMainTex", 0);
 
-            Vector2i pPosition = (Vector2i)parent.position;
-            //Vector2i pSize = (Vector2i)parent.size;
-            //Vector2 pAnchor = (Vector2)parent.anchor;
+        //            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        //            GL.BindTexture(TextureTarget.Texture2D, 0);
+        //        }
 
-            Vector2i cPosition = (Vector2i)child.position;
-            Vector2i cSize = (Vector2i)child.size;
-            Vector2 cAnchor = (Vector2)child.anchor;
+        //        LayoutType nextLayout = group.layoutType == LayoutType.Inherit ? layoutType : group.layoutType;
 
-            Vector2 childPosition = cPosition - cAnchor * cSize;
-
-            returnRect.position = (UIVector2I)(pPosition + childPosition);
-            returnRect.size = child.size;
-            returnRect.anchor = child.anchor;
-
-            switch (layoutType)
-            {
-                case LayoutType.Inherit:
-                    break;
-                case LayoutType.CenterHorizontal:
-                    break;
-                default:
-                    break;
-            }
-
-            return returnRect;
-        }
+        //        LayoutAndDrawGroups(nextLayout, group.children.ToArray(), layoutResult[i].Item1, layoutResult[i].Item2);
+        //    }
+        //}
         //private Vector2 CanvasSpaceToNDCSpace(Vector2i canvasSize, Vector2i point)
         //{
         //    Vector2 floatPoint = (Vector2)point;
