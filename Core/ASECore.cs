@@ -18,6 +18,11 @@ namespace AssemblyEngine
 
         internal static List<EngineObject> engineObjects = new List<EngineObject>();
 
+        public static void Main(string[] args)
+        {
+            ASECore core = new ASECore();
+            core.Init();
+        }
         public int Init()
         {
             AssetsPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -92,7 +97,10 @@ namespace AssemblyEngine
 
             foreach (var obj in engineObjects)
             {
-                obj.components.ForEach(c => c.Update());
+                foreach (var component in obj.components)
+                {
+                    component.Update();
+                }
             }
             foreach (var obj in engineObjects)
             {

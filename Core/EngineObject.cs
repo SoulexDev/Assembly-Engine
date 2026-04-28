@@ -11,7 +11,7 @@
         }
         public T AddComponent<T>(string name) where T : Component
         {
-            Component component = (T)new Component();
+            T component = (T)Activator.CreateInstance(typeof(T));
 
             component.name = name;
             component.engineObject = this;
@@ -20,7 +20,7 @@
 
             component.Init();
 
-            return (T)component;
+            return component;
         }
         public void RemoveComponent<T>(string name) where T :Component
         {

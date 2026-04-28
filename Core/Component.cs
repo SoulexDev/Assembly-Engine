@@ -6,6 +6,8 @@
         public EngineObject engineObject;
         public Transform transform => engineObject.transform;
 
+        public bool enabled;
+
         /// <summary>
         /// Init is called when the component has been attached to an object
         /// </summary>

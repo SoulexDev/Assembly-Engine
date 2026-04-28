@@ -10,7 +10,8 @@ namespace AssemblyEngine.Testing
 
         public override void Init()
         {
-            Camera camera = new Camera();
+            camera = new Camera();
+            Camera.main = camera;
         }
         public override void Update()
         {

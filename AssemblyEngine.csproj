@@ -20,7 +20,7 @@
 		<PackageReleaseNotes>None</PackageReleaseNotes>
 		<Company>The Dev Assembly</Company>
 		<Authors>AndreBluntIndie</Authors>
-		<Version>0.3.1</Version>
+		<Version>0.4.8</Version>
 		<PackageOutputPath>H:\LocalNugetPackages\</PackageOutputPath>
 	</PropertyGroup>
 
@@ -29,8 +29,7 @@
 		<Content Include="Resources\**">
 			<Pack>true</Pack>
 			<PackageCopyToOutput>true</PackageCopyToOutput>
-			<!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<PackagePath>runtimes\win-x64\net10.0</PackagePath>-->
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
 

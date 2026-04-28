@@ -10,13 +10,26 @@ namespace AssemblyEngine.Graphics
         private Model model;
         public Matrix4 modelMatrix;
 
+        public ModelRenderer(Model model, Matrix4 modelMatrix)
+        {
+            this.model = model;
+            this.modelMatrix = modelMatrix;
+
+            isDirty = false;
+
+            RenderPipeline.AddModelRenderer(this);
+        }
+        ~ModelRenderer()
+        {
+            RenderPipeline.RemoveModelRenderer(this);
+        }
         public override void Init()
         {
             RenderPipeline.AddModelRenderer(this);
         }
         public override void OnDestroy()
         {
-            RenderPipeline.AddModelRenderer(this);
+            RenderPipeline.RemoveModelRenderer(this);
         }
         public void SetMaterial(Material mat, int meshIndex = 0)
         {
@@ -33,9 +46,12 @@ namespace AssemblyEngine.Graphics
 
             if (isDirty)
             {
-                Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-                modelMatrix *= Matrix4.CreateScale(transform.scale);
-                modelMatrix *= Matrix4.CreateTranslation(transform.position);
+                if (transform != null)
+                {
+                    Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
+                    modelMatrix *= Matrix4.CreateScale(transform.scale);
+                    modelMatrix *= Matrix4.CreateTranslation(transform.position);
+                }
 
                 isDirty = false;
             }
@@ -87,9 +103,12 @@ namespace AssemblyEngine.Graphics
 
             if (isDirty)
             {
-                Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-                modelMatrix *= Matrix4.CreateScale(transform.scale);
-                modelMatrix *= Matrix4.CreateTranslation(transform.position);
+                if (transform != null)
+                {
+                    Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
+                    modelMatrix *= Matrix4.CreateScale(transform.scale);
+                    modelMatrix *= Matrix4.CreateTranslation(transform.position);
+                }
 
                 isDirty = false;
             }
