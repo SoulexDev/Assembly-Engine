@@ -27,7 +27,7 @@ namespace AssemblyEngine
 
         //resources
         private static Dictionary<string, Texture2D> textureResources = new Dictionary<string, Texture2D>();
-        //private static Dictionary<(string, ShaderType)[], Shader> shaderResources = new Dictionary<(string, ShaderType)[], Shader>();
+        private static Dictionary<string, Shader> shaderResources = new Dictionary<string, Shader>();
 
         public static bool LoadResource(out Texture2D texture, string filePath)
         {
@@ -35,7 +35,7 @@ namespace AssemblyEngine
                 return true;
 
             string preProcessFilePath = filePath;
-            filePath = Path.Combine(Core.AssetsPath, filePath);
+            filePath = Path.Combine(ASECore.AssetsPath, filePath);
 
             Console.WriteLine("Loading texture " + filePath);
 
@@ -48,10 +48,12 @@ namespace AssemblyEngine
         }
         public static bool LoadResource(out Shader shader, params (string, ShaderType)[] fileInfo)
         {
-            //if (shaderResources.TryGetValue(fileInfo, out shader))
-            //    return true;
+            if (shaderResources.TryGetValue(fileInfo[0].Item1, out shader))
+                return true;
 
-            Console.WriteLine("Loading shader " + Path.Combine(Core.AssetsPath, fileInfo[0].Item1));
+            string preProcessFilePath = fileInfo[0].Item1;
+
+            Console.WriteLine("Loading shader " + Path.Combine(ASECore.AssetsPath, fileInfo[0].Item1));
 
             (string, ShaderType)[] shaderInfo = new (string, ShaderType)[fileInfo.Length];
 
@@ -59,7 +61,7 @@ namespace AssemblyEngine
             {
                 var sInfo = shaderInfo[i];
 
-                string filePath = Path.Combine(Core.AssetsPath, fileInfo[i].Item1);
+                string filePath = Path.Combine(ASECore.AssetsPath, fileInfo[i].Item1);
 
                 sInfo.Item1 = File.ReadAllText(filePath + shaderFileExtensions[fileInfo[i].Item2]);
                 sInfo.Item2 = fileInfo[i].Item2;
@@ -76,6 +78,10 @@ namespace AssemblyEngine
             if (Shader.CreateShaderProgram(out int id, shaderInfo))
             {
                 shader = id;
+
+                if (!shaderResources.ContainsKey(preProcessFilePath))
+                    shaderResources.Add(preProcessFilePath, shader);
+
                 return true;
             }
             else
@@ -84,9 +90,9 @@ namespace AssemblyEngine
                 return false;
             }
         }
-        public static bool LoadResource(out Renderable renderable, string filePath)
+        public static bool LoadResource(out Model model, string filePath)
         {
-            filePath = Path.Combine(Core.AssetsPath, filePath);
+            filePath = Path.Combine(ASECore.AssetsPath, filePath);
 
             Console.WriteLine("Loading model " + filePath);
 
@@ -99,26 +105,26 @@ namespace AssemblyEngine
                 if (scene == null || ((scene.SceneFlags & Assimp.SceneFlags.Incomplete) != 0) || scene.RootNode == null)
                 {
                     Console.WriteLine($"Failed to import model {filePath}");
-                    renderable = null;
+                    model = null;
                     return false;
                 }
 
-                renderable = new Renderable(new Transform());
+                model = new Model();
 
-                ProcessNode(scene.RootNode, scene, ref renderable);
+                ProcessNode(scene.RootNode, scene, ref model);
             }
             return true;
         }
-        private static void ProcessNode(Assimp.Node node, Assimp.Scene scene, ref Renderable renderable)
+        private static void ProcessNode(Assimp.Node node, Assimp.Scene scene, ref Model model)
         { 
             for (int i = 0; i < node.MeshCount; i++)
             {
                 Assimp.Mesh mesh = scene.Meshes[node.MeshIndices[i]];
-                renderable.meshes.Add(ProcessMesh(mesh, scene));
+                model.meshes.Add(ProcessMesh(mesh, scene));
             }
             for (int i = 0; i < node.ChildCount; i++)
             {
-                ProcessNode(node.Children[i], scene, ref renderable);
+                ProcessNode(node.Children[i], scene, ref model);
             }
         }
         private static (Mesh, Material) ProcessMesh(Assimp.Mesh assimpMesh, Assimp.Scene scene)
@@ -126,7 +132,7 @@ namespace AssemblyEngine
             //float[] vertices = new float[mesh.VertexCount];
             List<float> vertices = new List<float>();
             List<int> indices = new List<int>();
-            Material mat = new Material(Core.defaultShader);
+            Material mat = new Material(ASECore.defaultShader);
 
             //VertexAttributeType types = 0;
 

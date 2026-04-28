@@ -3,7 +3,7 @@
     internal class Plane
     {
         public Transform transform;
-        public Renderable renderable;
+        public ModelRenderer renderable;
 
         public Plane(Mesh mesh, Material mat)
         {

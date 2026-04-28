@@ -42,10 +42,10 @@ namespace AssemblyEngine.Graphics
         {
             uint lastTexID = 0;
 
-            Core.defaultParticleShader.Use();
+            ASECore.defaultParticleShader.Use();
 
-            Core.defaultParticleShader.SetMatrix4("uView", Camera.main.viewMatrix);
-            Core.defaultParticleShader.SetMatrix4("uProjection", Camera.main.projectionMatrix);
+            ASECore.defaultParticleShader.SetMatrix4("uView", Camera.main.viewMatrix);
+            ASECore.defaultParticleShader.SetMatrix4("uProjection", Camera.main.projectionMatrix);
 
             GL.BindVertexArray(QuadMesh.mesh.vao);
             foreach(Particle p in particlePool)
@@ -54,16 +54,16 @@ namespace AssemblyEngine.Graphics
                 {
                     GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2D, p.textureID);
-                    Core.defaultParticleShader.SetTexture("uMainTex", 0);
+                    ASECore.defaultParticleShader.SetTexture("uMainTex", 0);
                 }
 
                 Matrix4 modelMatrix = Matrix4.Identity;
                 modelMatrix *= Matrix4.CreateScale(Vector3.One);
                 modelMatrix *= Matrix4.CreateTranslation(p.position);
 
-                Core.defaultParticleShader.SetMatrix4("uModel", modelMatrix);
-                Core.defaultParticleShader.SetVector("uCenter", p.position);
-                Core.defaultParticleShader.SetVector("uSize", p.size);
+                ASECore.defaultParticleShader.SetMatrix4("uModel", modelMatrix);
+                ASECore.defaultParticleShader.SetVector("uCenter", p.position);
+                ASECore.defaultParticleShader.SetVector("uSize", p.size);
                 GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
                 lastTexID = p.textureID;

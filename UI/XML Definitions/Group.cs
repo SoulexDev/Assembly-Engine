@@ -8,6 +8,9 @@ namespace AssemblyEngine.UI
     [XmlType(Namespace = "https://thedevassembly.com")]
     public class Group
     {
+        //[XmlIgnore]
+        //private bool isDirty = true;
+
         [XmlAttribute("id")]
         public string id;
 
@@ -17,17 +20,32 @@ namespace AssemblyEngine.UI
         [XmlElement("size")]
         public UIVector2I internalSize;
 
+        //[XmlIgnore]
+        //private UIVector2 _anchor;
+
         [XmlElement("anchor")]
-        public UIVector2 internalAnchor;
+        public UIVector2 anchor;
+
+        //[XmlIgnore]
+        //private Vector2i _position;
 
         [XmlIgnore]
         public Vector2i position;
 
+        //[XmlIgnore]
+        //private Vector2i _size;
+
         [XmlIgnore]
         public Vector2i size;
 
+        //[XmlIgnore]
+        //private LayoutInteraction _layoutInteraction;
+
         [XmlElement("layoutInteraction")]
         public LayoutInteraction layoutInteraction;
+
+        //[XmlIgnore]
+        //private LayoutType _layoutType;
 
         [XmlElement("layoutType")]
         public LayoutType layoutType;
@@ -79,11 +97,10 @@ namespace AssemblyEngine.UI
         public List<Group> children = new List<Group>();
 
         public Group() { }
-        public Group(UIVector2I position, UIVector2I size, UIVector2 anchor)
-        {
-            this.internalPosition = position;
-            this.internalSize = size;
-            this.internalAnchor = anchor;
-        }
+
+        //public void SetDirty()
+        //{
+        //    isDirty = true;
+        //}
     }
 }

@@ -6,6 +6,7 @@
         private static CenterHorizontalLayoutProcessor centerHorizontalLayoutProcessor = new CenterHorizontalLayoutProcessor();
 
         private static FillHorizontalLayoutProcessor fillHorizontalLayoutProcessor = new FillHorizontalLayoutProcessor();
+        private static FillVerticalLayoutProcessor fillVerticalLayoutProcessor = new FillVerticalLayoutProcessor();
 
         public static Dictionary<LayoutType, ILayoutProcessor> layoutProcessors = new Dictionary<LayoutType, ILayoutProcessor>()
         {
@@ -28,8 +29,8 @@
             { LayoutType.BottomRightVertical, centerHorizontalLayoutProcessor }, //unimplemented
             { LayoutType.BottomLeftHorizontal, centerHorizontalLayoutProcessor }, //unimplemented
             { LayoutType.BottomLeftVertical, centerHorizontalLayoutProcessor }, //unimplemented
-            { LayoutType.FillHorizontal, fillHorizontalLayoutProcessor }, //wip
-            { LayoutType.FillVertical, centerHorizontalLayoutProcessor }, //unimplemented
+            { LayoutType.FillHorizontal, fillHorizontalLayoutProcessor }, //done
+            { LayoutType.FillVertical, fillVerticalLayoutProcessor }, //unimplemented
             { LayoutType.FillHorizontalRight, centerHorizontalLayoutProcessor }, //unimplemented
             { LayoutType.FillVerticalRight, centerHorizontalLayoutProcessor }, //unimplemented
             { LayoutType.FillHorizontalLeft, centerHorizontalLayoutProcessor }, //unimplemented

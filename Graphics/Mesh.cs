@@ -163,9 +163,9 @@ namespace AssemblyEngine.Graphics
         {
             if (!_disposed)
             {
-                GL.DeleteBuffers(1, ref vao);
-                GL.DeleteBuffers(1, ref vbo);
-                GL.DeleteBuffers(1, ref ebo);
+                //GL.DeleteBuffers(1, ref vao);
+                //GL.DeleteBuffers(1, ref vbo);
+                //GL.DeleteBuffers(1, ref ebo);
                 _disposed = true;
             }
         }

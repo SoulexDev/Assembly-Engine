@@ -3,16 +3,16 @@ using static SDL3.SDL;
 
 namespace AssemblyEngine.Testing
 {
-    internal class FreeCam
+    internal class FreeCam : Component
     {
         private Camera camera;
         private float mouseX, mouseY;
 
-        public FreeCam(Camera camera)
+        public override void Init()
         {
-            this.camera = camera;
+            Camera camera = new Camera();
         }
-        public void Move()
+        public override void Update()
         {
             Vector3 moveVector = Vector3.Zero;
 

@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System.Collections;
 
 namespace AssemblyEngine.Graphics
 {
@@ -7,18 +8,14 @@ namespace AssemblyEngine.Graphics
     {
         public Shader shader;
 
-        public bool blendingEnabled = false;
-        public BlendingFactor srcBlendMode = BlendingFactor.SrcAlpha;
-        public BlendingFactor dstBlendMode = BlendingFactor.OneMinusSrcAlpha;
+        private BlendingFactor srcBlendMode = BlendingFactor.SrcAlpha;
+        private BlendingFactor dstBlendMode = BlendingFactor.OneMinusSrcAlpha;
 
-        public bool logicOpEnabled = false;
-        public LogicOp logicOp = LogicOp.Noop;
+        private LogicOp logicOp = LogicOp.Noop;
 
-        public bool cullFaceEnabled = true;
-        public TriangleFace cullFaceMode = TriangleFace.Back;
+        private TriangleFace cullFaceMode = TriangleFace.Back;
 
-        public bool depthTestEnabled = true;
-        public DepthFunction depthFunction = DepthFunction.Lequal;
+        private DepthFunction depthFunction = DepthFunction.Lequal;
 
         public List<(string, Texture2D)> texture2Ds = new List<(string, Texture2D)>();
         public List<(string, int)> integers = new List<(string, int)>();
@@ -27,74 +24,98 @@ namespace AssemblyEngine.Graphics
         public List<(string, Vector3)> vector3s = new List<(string, Vector3)>();
         public List<(string, Vector4)> vector4s = new List<(string, Vector4)>();
 
-        public Material(Shader shader, 
-            bool blendingEnabled = false, 
-            BlendingFactor srcBlendMode = BlendingFactor.SrcAlpha, 
-            BlendingFactor dstBlendMode = BlendingFactor.OneMinusSrcAlpha, 
-            bool logicOpEnabled = false, 
-            LogicOp logicOp = LogicOp.Noop, 
-            bool cullFaceEnabled = true,
-            TriangleFace cullFaceMode = TriangleFace.Back, 
-            bool depthTestEnabled = true, 
-            DepthFunction depthFunction = DepthFunction.Lequal)
+        private BitArray materialStates;
+
+        public Material(Shader shader)
         {
             this.shader = shader;
-            this.blendingEnabled = blendingEnabled;
+
+            //blending, logic op, cull face, depth test
+            materialStates = new BitArray([false, false, true, true]);
+        }
+        public Material EnabledBlending(BlendingFactor srcBlendMode, BlendingFactor dstBlendMode)
+        {
+            materialStates[0] = true;
             this.srcBlendMode = srcBlendMode;
             this.dstBlendMode = dstBlendMode;
-            this.logicOpEnabled = logicOpEnabled;
+            return this;
+        }
+        public Material DisableBlending()
+        {
+            materialStates[0] = false;
+            return this;
+        }
+        public Material EnableLogicOp(LogicOp logicOp)
+        {
+            materialStates[1] = true;
             this.logicOp = logicOp;
-            this.cullFaceEnabled = cullFaceEnabled;
+            return this;
+        }
+        public Material DisableLogicOp()
+        {
+            materialStates[1] = false;
+            return this;
+        }
+        public Material EnableCullFace(TriangleFace cullFaceMode)
+        {
+            materialStates[2] = true;
             this.cullFaceMode = cullFaceMode;
-            this.depthTestEnabled = depthTestEnabled;
+            return this;
+        }
+        public Material DisableCullFace()
+        {
+            materialStates[2] = false;
+            return this;
+        }
+        public Material EnableDepthTest(DepthFunction depthFunction)
+        {
+            materialStates[3] = true;
             this.depthFunction = depthFunction;
+            return this;
+        }
+        public Material DisableDepthTest()
+        {
+            materialStates[3] = false;
+            return this;
         }
         public void Use()
         {
             shader.Use();
 
             //blending
-            if (blendingEnabled)
+            if (materialStates[0])
             {
-                if (!GL.IsEnabled(EnableCap.Blend))
-                    GL.Enable(EnableCap.Blend);
-
+                GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(srcBlendMode, dstBlendMode);
             }
-            else if (GL.IsEnabled(EnableCap.Blend))
+            else
                 GL.Disable(EnableCap.Blend);
 
             //logic op
-            if (logicOpEnabled)
+            if (materialStates[1])
             {
-                if (!GL.IsEnabled(EnableCap.ColorLogicOp))
-                    GL.Enable(EnableCap.ColorLogicOp);
-
+                GL.Enable(EnableCap.ColorLogicOp);
                 GL.LogicOp(logicOp);
             }
-            else if (GL.IsEnabled(EnableCap.ColorLogicOp))
+            else
                 GL.Disable(EnableCap.ColorLogicOp);
 
-            //face culling
-            if (cullFaceEnabled)
+            //cull face
+            if (materialStates[2])
             {
-                if (!GL.IsEnabled(EnableCap.CullFace))
-                    GL.Enable(EnableCap.CullFace);
-
+                GL.Enable(EnableCap.CullFace);
                 GL.CullFace(cullFaceMode);
             }
-            else if (GL.IsEnabled(EnableCap.CullFace))
+            else
                 GL.Disable(EnableCap.CullFace);
 
             //depth test
-            if (depthTestEnabled)
+            if (materialStates[3])
             {
-                if (!GL.IsEnabled(EnableCap.DepthTest))
-                    GL.Enable(EnableCap.DepthTest);
-
+                GL.Enable(EnableCap.DepthTest);
                 GL.DepthFunc(depthFunction);
             }
-            else if (GL.IsEnabled(EnableCap.DepthTest))
+            else
                 GL.Disable(EnableCap.DepthTest);
 
             //textures
@@ -102,8 +123,9 @@ namespace AssemblyEngine.Graphics
             {
                 for (int i = 0; i < texture2Ds.Count; i++)
                 {
-                    texture2Ds[i].Item2.Bind(GetTextureUnit(i + 1));
-                    shader.SetTexture(texture2Ds[i].Item1, i + 1);
+                    //TODO: increment and decrement light count depending on distance to determine the shadow texture offset
+                    texture2Ds[i].Item2.Bind(GetTextureUnit(i + RenderPipeline.lights.Count));
+                    shader.SetTexture(texture2Ds[i].Item1, i + RenderPipeline.lights.Count);
                 }
             }
 

@@ -4,8 +4,10 @@ namespace AssemblyEngine
 {
     public class Transform
     {
-        public Transform? parent;
-        public List<Transform>? children;
+        public bool isDirty = true;
+
+        public Transform parent;
+        public List<Transform> children;
 
         public Vector3 localPosition = Vector3.Zero;
         public Quaternion localRotation = Quaternion.Identity;
@@ -22,10 +24,15 @@ namespace AssemblyEngine
             }
             set
             {
-                if (parent == null)
-                    localPosition = value;
-                else
-                    localPosition = value - parent.position;
+                if (localPosition != value)
+                {
+                    if (parent == null)
+                        localPosition = value;
+                    else
+                        localPosition = value - parent.position;
+
+                    isDirty = true;
+                }
             }
         }
         public Quaternion rotation
@@ -39,10 +46,15 @@ namespace AssemblyEngine
             }
             set
             {
-                if (parent == null)
-                    localRotation = value;
-                else
-                    localRotation = value * parent.rotation.Inverted();
+                if (localRotation != value)
+                {
+                    if (parent == null)
+                        localRotation = value;
+                    else
+                        localRotation = value * parent.rotation.Inverted();
+
+                    isDirty = true;
+                }
             }
         }
         public Vector3 scale
@@ -56,10 +68,15 @@ namespace AssemblyEngine
             }
             set
             {
-                if (parent == null)
-                    localScale = value;
-                else if (parent.scale.LengthSquared != 0)
-                    localScale = value / parent.scale;
+                if (localScale != value)
+                {
+                    if (parent == null)
+                        localScale = value;
+                    else if (parent.scale.LengthSquared != 0)
+                        localScale = value / parent.scale;
+
+                    isDirty = true;
+                }
             }
         }
         public Vector3 right

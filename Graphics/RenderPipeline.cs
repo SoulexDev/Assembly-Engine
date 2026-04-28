@@ -1,23 +1,36 @@
 ﻿using static SDL3.SDL;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using AssemblyEngine.UI;
 
 namespace AssemblyEngine.Graphics
 {
     public class RenderPipeline
     {
-        //private Window window = default!;
         public static nint window;
         public static nint glContext;
 
         public static RenderTexture shadowTex;
         public static Shader shadowShader;
+        public static Shader skyboxShader;
         public static Camera sunCam;
 
         private static (RenderTexture, RenderTexture) postProcessBuffers;
 
-        private static List<Renderable> renderables = new List<Renderable>();
+        //soon, a new architecture will be implemented that should massively improve performance for large scenes.
+        //the renderpipeline will hold a list of materials, each corresponding to a list of "renderable indices".
+        //renderable indices are simple a pair of a renderable, and a material index. since we want to distinguish objects as a whole
+        //from one another, it's necessary that renderables are aware of their mesh parts. sorting meshes exclusively by material
+        //would jumble up renderables. a renderable would have meshes that are in multiple lists, which isn't ideal, and developing a system
+        //to track meshes would be prone to bugs and would be difficult to do properly.
+        //meshes are drawn by the renderable, from the renderpipeline material list
+
+        //private static Dictionary<Material, List<ModelRenderIndex>> materialModelLists = new Dictionary<Material, List<ModelRenderIndex>>();
+
+        private static List<ModelRenderer> modelRenderers = new List<ModelRenderer>();
+        private static List<ASXMLCanvas> canvases = new List<ASXMLCanvas>();
         private static List<PostEffect> postEffects = new List<PostEffect>();
+        internal static List<Light> lights = new List<Light>();
 
         public static bool Init()
         {
@@ -40,44 +53,46 @@ namespace AssemblyEngine.Graphics
 
             if (!SDL_GL_SetSwapInterval(1))
             {
-                Console.WriteLine("Coould not set v-sync");
+                Console.WriteLine("Could not set v-sync");
                 return false;
             }
 
             FullscreenQuadMesh.Create();
+            SkyboxMesh.Create();
+            QuadMesh.Create();
 
-            shadowTex = new RenderTexture(2048, 2048, RenderTextureType.Depth, TextureWrapMode.ClampToBorder, TextureMinFilter.Linear, TextureMagFilter.Linear);
-            sunCam = new Camera(40.0f, 40.0f, 1.0f, 100.0f);
-            sunCam.transform.position = new Vector3(5.0f, 10.0f, 5.0f) * 4.0f;
-            sunCam.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegToRad * -135.0f);
-            sunCam.transform.rotation *= Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * 45.0f);
+            lights.Add(new Light(2048));
 
             postProcessBuffers = (
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal),
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal));
 
             ResourceLoader.LoadResource(out Shader gammaShader, 
-                ("shaders/internal/post_effect", ShaderType.VertexShader), 
-                ("shaders/internal/gamma_correction_effect", ShaderType.FragmentShader));
+                ("internal/shaders/post_effect", ShaderType.VertexShader), 
+                ("internal/shaders/gamma_correction_effect", ShaderType.FragmentShader));
 
             PushPostEffect(new PostEffect(gammaShader));
             
             ResourceLoader.LoadResource(out shadowShader, 
-                ("shaders/internal/shadow", ShaderType.VertexShader), 
-                ("shaders/internal/shadow", ShaderType.FragmentShader));
+                ("internal/shaders/shadow", ShaderType.VertexShader), 
+                ("internal/shaders/shadow", ShaderType.FragmentShader));
+
+            ResourceLoader.LoadResource(out skyboxShader,
+                ("internal/shaders/skybox/skybox", ShaderType.VertexShader),
+                ("internal/shaders/skybox/skybox_procedural", ShaderType.FragmentShader));
 
             Camera.main = new Camera();
             //Camera.main = sunCam;
 
             return true;
         }
-        public static void AddRenderable(Renderable renderable)
+        public static void AddModelRenderer(ModelRenderer modelRenderer)
         {
-            renderables.Add(renderable);
+            modelRenderers.Add(modelRenderer);
         }
-        public static void RemoveRenderable(Renderable renderable)
+        public static void RemoveModelRenderer(ModelRenderer modelRenderer)
         {
-            renderables.Remove(renderable);
+            modelRenderers.Remove(modelRenderer);
         }
         public static void PushPostEffect(PostEffect postEffect)
         {
@@ -96,23 +111,15 @@ namespace AssemblyEngine.Graphics
             //enable depth testing
             GL.Enable(EnableCap.DepthTest);
 
-            //render sun depth for shadows
-            GL.Viewport(0, 0, shadowTex.width, shadowTex.height);
-            //sunCam.transform.position = Camera.main.transform.position + new Vector3(5.0f, 5.0f, 5.0f) * 4.0f;
-
-            shadowTex.Bind();
-
-            GL.Clear(ClearBufferMask.DepthBufferBit);
-            sunCam.SetMatrices();
-
-            GL.Disable(EnableCap.CullFace);
-            foreach (Renderable renderable in renderables)
+            //render light depth for shadows
+            foreach (var light in lights)
             {
-                renderable.Draw(sunCam, shadowShader);
-            }
-            GL.Enable(EnableCap.CullFace);
+                //light.transform.Rotate(Vector3.UnitZ, 240 * Time.deltaTime);
+                light.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, 50) * 
+                    Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * 45);
 
-            shadowTex.Unbind();
+                light.DrawShadows(modelRenderers);
+            }
 
             //render scene
             GL.Viewport(0, 0, Engine.screenWidth, Engine.screenHeight);
@@ -120,17 +127,27 @@ namespace AssemblyEngine.Graphics
             if (postEffects.Count > 0)
                 postProcessBuffers.Item1.Bind();
 
-            GL.ClearColor(0.4f, 0.5f, 0.7f, 1.0f);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             Camera.main.SetMatrices();
-            foreach (Renderable renderable in renderables)
+            foreach (ModelRenderer modelRenderer in modelRenderers)
             {
-                renderable.Draw(Camera.main);
+                modelRenderer.Draw(Camera.main);
             }
 
             //render particles
-            ParticleManager.DrawParticles();
+            //ParticleManager.DrawParticles();
+
+            //render skybox
+            GL.Enable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.CullFace);
+            GL.DepthFunc(DepthFunction.Lequal);
+
+            skyboxShader.Use();
+            skyboxShader.SetMatrix4("uProjection", Camera.main.projectionMatrix);
+            skyboxShader.SetMatrix4("uView", Camera.main.viewMatrix.ClearTranslation());
+            SkyboxMesh.mesh.Draw();
 
             //disable depth testing for rendering ui and post effects
             GL.Disable(EnableCap.DepthTest);
@@ -143,7 +160,10 @@ namespace AssemblyEngine.Graphics
             }
 
             //render ui
-            Core.canvas.Draw();
+            foreach (var canvas in canvases)
+            {
+                canvas.Draw();
+            }
 
             SDL_GL_SwapWindow(window);
         }

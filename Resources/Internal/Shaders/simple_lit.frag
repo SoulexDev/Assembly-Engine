@@ -15,7 +15,7 @@ uniform sampler2D uMainTex;
 uniform sampler2D uShadowTex0;
 
 uniform float uTime;
-uniform vec3 uLightPos;
+uniform vec4 uLightPos0;
 uniform vec3 uViewPos;
 
 vec2 vogel_disk_sample(int sampleIndex, int sampleCount, float phi){
@@ -84,7 +84,7 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 void main(){
 	vec3 normal = normalize(v_in.normal);
 
-	vec3 lightDir = normalize(uLightPos - v_in.fragPos);
+	vec3 lightDir = normalize(uLightPos0.w == 1 ? -uLightPos0.xyz : (uLightPos0.xyz - v_in.fragPos));
 	vec3 viewDir = normalize(uViewPos - v_in.fragPos);
 	
 	vec3 diffuse = texture(uMainTex, v_in.texCoord).rgb;

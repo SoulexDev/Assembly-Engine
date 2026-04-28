@@ -20,18 +20,11 @@
 		<PackageReleaseNotes>None</PackageReleaseNotes>
 		<Company>The Dev Assembly</Company>
 		<Authors>AndreBluntIndie</Authors>
-		<Version>0.3.1</Version>
-		<PackageOutputPath>H:\LocalNugetPackages\</PackageOutputPath>
+		<Version>0.0.5</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Content Include="ase.ico" />
-		<Content Include="Resources\**">
-			<Pack>true</Pack>
-			<PackageCopyToOutput>true</PackageCopyToOutput>
-			<!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<PackagePath>runtimes\win-x64\net10.0</PackagePath>-->
-		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,6 +38,20 @@
 		<PackageReference Include="OpenTK.Mathematics" Version="4.9.4" />
 		<PackageReference Include="SpaceWizards.Sdl" Version="1.1.1" />
 		<PackageReference Include="StbImageSharp" Version="2.30.15" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="resources\**">
+			<Pack>true</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackagePath>runtimes\win-x64\net10.0</PackagePath>
+			<!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Graphics\Particles\EmitterShapes\" />
+		<Folder Include="resources\textures\ui\" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -21,11 +21,7 @@ namespace AssemblyEngine.Graphics.Testing
         };
         public static Plane Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10, float uvScale = 1)
         {
-            ResourceLoader.LoadResource(out Shader shader, 
-                ("shaders/internal/simple_lit", ShaderType.VertexShader), 
-                ("shaders/internal/simple_lit", ShaderType.FragmentShader));
-
-            Material mat = new Material(shader);
+            Material mat = new Material(ASECore.defaultShader);
             mat.texture2Ds.Add(("uMainTex", texture));
 
             List<float> vertices = new List<float>();

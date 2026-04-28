@@ -3,7 +3,7 @@
 namespace AssemblyEngine
 {
     public enum CameraProjectionType { Perspective, Orthographic }
-    public class Camera
+    public sealed class Camera
     {
         public static Camera main;
 

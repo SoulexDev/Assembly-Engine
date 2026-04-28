@@ -19,7 +19,7 @@
 			<anchor x="0" y="0"/>
 
 			<layoutInteraction>ignore</layoutInteraction>
-			<layoutType>center-horizontal</layoutType>
+			<layoutType>fill-horizontal</layoutType>
 			<color>#ffffffff</color>
 			
 			<Group id="baby group 1">
@@ -30,27 +30,51 @@
 				<layoutInteraction>ignore</layoutInteraction>
 				<layoutType>inherit</layoutType>
 				<color>#ffffffff</color>
-				<image>textures/brick_medieval.jpg</image>
+				<image>internal/textures/brick_medieval.jpg</image>
 			</Group>
+			
 			<Group id="baby group 2">
 				<position x="960" y="540"/>
 				<size x="200" y="125"/>
 				<anchor x="0.5" y="0.5"/>
 
 				<layoutInteraction>ignore</layoutInteraction>
-				<layoutType>inherit</layoutType>
+				<layoutType>fill-vertical</layoutType>
 				<color>#ffffffff</color>
-				<image>textures/Prototype_Dark.png</image>
+				<image>internal/textures/Prototype_Dark.png</image>
+
+				<Group id="fart group a">
+					<position x="0" y="0"/>
+					<size x="1" y="1"/>
+					<anchor x="0" y="0"/>
+
+					<layoutInteraction>ignore</layoutInteraction>
+					<layoutType>inherit</layoutType>
+					<color>#ffffffff</color>
+					<image>internal/textures/creepfur.png</image>
+				</Group>
+
+				<Group id="fart group b">
+					<position x="0" y="0"/>
+					<size x="1" y="1"/>
+					<anchor x="0" y="0"/>
+
+					<layoutInteraction>ignore</layoutInteraction>
+					<layoutType>inherit</layoutType>
+					<color>#ffffffff</color>
+					<image>internal/textures/Prototype_Dark.png</image>
+				</Group>
 			</Group>
+			
 			<Group id="baby group 3">
 				<position x="960" y="540"/>
 				<size x="50" y="250"/>
 				<anchor x="0.5" y="0.5"/>
 
 				<layoutInteraction>ignore</layoutInteraction>
-				<layoutType>inherit</layoutType>
+				<layoutType>fill-vertical</layoutType>
 				<color>#ffffffff</color>
-				<image>textures/grass_seamless.jpg</image>
+				<image>internal/textures/Prototype_Light.png</image>
 			</Group>
 		</Group>
 	</Group>

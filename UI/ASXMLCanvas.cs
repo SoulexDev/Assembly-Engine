@@ -27,8 +27,8 @@ namespace AssemblyEngine.UI
         }
         public static ASXMLCanvas LoadFromXML(string xmlPath)
         {
-            xmlPath = Path.Combine(Core.AssetsPath, xmlPath);
-            string xsdPath = Path.Combine(Core.AssetsPath, "ui/ASXML.xsd");
+            xmlPath = Path.Combine(ASECore.AssetsPath, xmlPath);
+            string xsdPath = Path.Combine(ASECore.AssetsPath, "internal/ui/ASXML.xsd");
 
             Console.WriteLine($"Loading ASXML: {xmlPath}");
 
@@ -78,8 +78,8 @@ namespace AssemblyEngine.UI
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
-            Core.defaultUIShader.Use();
-            Core.defaultUIShader.SetVector("uCanvasSize", (Vector2i)canvasSize);
+            ASECore.defaultUIShader.Use();
+            ASECore.defaultUIShader.SetVector("uCanvasSize", (Vector2i)canvasSize);
 
             GL.BindVertexArray(FullscreenQuadMesh.mesh.vao);
 
@@ -96,11 +96,9 @@ namespace AssemblyEngine.UI
             GL.BindVertexArray(0);
             GL.Disable(EnableCap.Blend);
         }
-        //draw group
-        //layout group children
-        //recurse with group, child group, and transformed layout
 
         //TODO: create dirty feature, only rebuilding the layout when necessary
+        //TODO: create per-element dirty feature
         private void LayoutGroups(Group[] groups, LayoutType layoutType, Vector2 parentPositionT, Vector2 parentSizeT)
         {
             if (groups.Length == 0)
@@ -124,13 +122,13 @@ namespace AssemblyEngine.UI
             {
                 if (!string.IsNullOrEmpty(group.imagePath))
                 {
-                    Core.defaultUIShader.SetVector("uPosition", group.position);
-                    Core.defaultUIShader.SetVector("uSize", group.size);
-                    Core.defaultUIShader.SetColor("uColor", group.color);
+                    ASECore.defaultUIShader.SetVector("uPosition", group.position);
+                    ASECore.defaultUIShader.SetVector("uSize", group.size);
+                    ASECore.defaultUIShader.SetColor("uColor", group.color);
 
                     GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2D, group.texture);
-                    Core.defaultUIShader.SetTexture("uMainTex", 0);
+                    ASECore.defaultUIShader.SetTexture("uMainTex", 0);
 
                     GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
                     GL.BindTexture(TextureTarget.Texture2D, 0);

@@ -1,13 +1,12 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AssemblyEngine.Graphics.Testing
+namespace AssemblyEngine.Graphics
 {
-    internal class Cube
+    public class CubeMesh
     {
-        private static List<float> vertices = new List<float>()
+        private static float[] vertices = new float[]
         {
             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f,
              0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f,
@@ -51,19 +50,11 @@ namespace AssemblyEngine.Graphics.Testing
             -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
         };
-        public Transform transform;
-        public ModelRenderer renderable;
 
-        public Cube(Texture2D texture)
+        public static Mesh mesh;
+        public static void Create()
         {
-            Material mat = new Material(ASECore.defaultShader).DisableCullFace();
-            mat.texture2Ds.Add(("uMainTex", texture));
-
-            Mesh mesh = new Mesh(vertices, PrimitiveType.Triangles, BufferUsageHint.StaticDraw, 
-                VertexAttribute.Vector3, VertexAttribute.Vector3, VertexAttribute.Vector2);
-
-            transform = new Transform();
-            renderable = new Renderable(transform, (mesh, mat));
+            //mesh = new Mesh(vertices);
         }
     }
 }

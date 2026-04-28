@@ -46,11 +46,11 @@
 			<xs:enumeration value="left-vertical"/>
 			<xs:enumeration value="top-right-horizontal"/>
 			<xs:enumeration value="top-right-vertical"/>
-			<xs:enumeration value="top-left-hotizontal"/>
+			<xs:enumeration value="top-left-horizontal"/>
 			<xs:enumeration value="top-left-vertical"/>
 			<xs:enumeration value="bottom-right-horizontal"/>
 			<xs:enumeration value="bottom-right-vertical"/>
-			<xs:enumeration value="bottom-left-hotizontal"/>
+			<xs:enumeration value="bottom-left-horizontal"/>
 			<xs:enumeration value="bottom-left-vertical"/>
 			<xs:enumeration value="fill-horizontal"/>
 			<xs:enumeration value="fill-vertical"/>
