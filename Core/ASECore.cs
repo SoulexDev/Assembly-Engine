@@ -18,11 +18,11 @@ namespace AssemblyEngine
 
         internal static List<EngineObject> engineObjects = new List<EngineObject>();
 
-        public static void Main(string[] args)
-        {
-            ASECore core = new ASECore();
-            core.Init();
-        }
+        //public static void Main(string[] args)
+        //{
+        //    ASECore core = new ASECore();
+        //    core.Init();
+        //}
         public int Init()
         {
             AssetsPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -42,9 +42,6 @@ namespace AssemblyEngine
             }
             Input.Init();
 
-            //ECSManager.Init();
-            GL.LineWidth(1.5f);
-
             //create internal objects
             ResourceLoader.LoadResource(out defaultShader,
                 ("internal/shaders/simple_lit", ShaderType.VertexShader),
@@ -61,29 +58,6 @@ namespace AssemblyEngine
             EngineObject obj = EngineObjectFactory.Instantiate();
             obj.AddComponent<FreeCam>("free cam 1");
 
-            //ResourceLoader.LoadResource(out Texture2D checkerDark, "internal/textures/Prototype_Dark.png");
-            //ResourceLoader.LoadResource(out Texture2D checkerLight, "internal/textures/Prototype_Light.png");
-            //ResourceLoader.LoadResource(out Texture2D particlesTex, "internal/textures/gaussian_circle_1.png");
-            //ResourceLoader.LoadResource(out Texture2D guitarTex, "internal/models/1001_albedo.jpg");
-
-            //Plane plane = PlaneGenerator.Generate(checkerLight, PrimitiveType.Triangles, 25, 25, 100);
-            //plane.transform.scale = Vector3.One * 4;
-
-            //ResourceLoader.LoadResource(out Renderable guitar, "internal/models/guitartypeshi.fbx");
-            //guitar.transform.position = Vector3.UnitY * 4;
-
-            //Material guitarMat = new Material(defaultShader);
-            //guitarMat.texture2Ds.Add(("uMainTex", guitarTex));
-
-            //guitar.SetMaterial(guitarMat);
-
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    Cube cube = new Cube(checkerDark);
-            //    cube.transform.position = 16 * new Vector3((float)MathHelper.Cos(i / 8f * MathHelper.TwoPi), 0, (float)MathHelper.Sin(i / 8f * MathHelper.TwoPi));
-            //    cube.transform.scale = new Vector3(2, 40, 2);
-            //}
-
             //ParticleManager.EmitParticles(particlesTex);
 
             OnAppInit?.Invoke();
@@ -97,10 +71,7 @@ namespace AssemblyEngine
 
             foreach (var obj in engineObjects)
             {
-                foreach (var component in obj.components)
-                {
-                    component.Update();
-                }
+                obj.components.ForEach(c => c.Update());
             }
             foreach (var obj in engineObjects)
             {
