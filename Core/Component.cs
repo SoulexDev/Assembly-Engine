@@ -30,6 +30,13 @@
 
         }
         /// <summary>
+        /// PhysicsTick is called just before the physics simulation is timestepped
+        /// </summary>
+        public virtual void PhysicsTick()
+        {
+
+        }
+        /// <summary>
         /// OnDestroy is called before the EngineObject is destroyed
         /// </summary>
         public virtual void OnDestroy()

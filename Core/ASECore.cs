@@ -1,6 +1,8 @@
 ﻿using AssemblyEngine.Graphics;
+using AssemblyEngine.Physics;
 using AssemblyEngine.Testing;
 using OpenTK.Graphics.OpenGL4;
+using System.Diagnostics;
 using static SDL3.SDL;
 
 namespace AssemblyEngine
@@ -18,11 +20,14 @@ namespace AssemblyEngine
 
         internal static List<EngineObject> engineObjects = new List<EngineObject>();
 
-        //public static void Main(string[] args)
-        //{
-        //    ASECore core = new ASECore();
-        //    core.Init();
-        //}
+        private static Stopwatch fixedStepTimer;
+        private static float timerOffset;
+
+        public static void Main(string[] args)
+        {
+            ASECore core = new ASECore();
+            core.Init();
+        }
         public int Init()
         {
             AssetsPath = AppDomain.CurrentDomain.BaseDirectory;
@@ -40,6 +45,10 @@ namespace AssemblyEngine
             {
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
+            fixedStepTimer = new Stopwatch();
+            fixedStepTimer.Start();
+
+            PhysicsSimulation.Init();
             Input.Init();
 
             //create internal objects
@@ -78,6 +87,20 @@ namespace AssemblyEngine
                 obj.components.ForEach(c => c.LateUpdate());
             }
 
+            if (fixedStepTimer.ElapsedMilliseconds + timerOffset > 20)
+            {
+                timerOffset = fixedStepTimer.ElapsedMilliseconds + timerOffset - 20;
+                fixedStepTimer.Restart();
+
+                Time.FixedUpdate();
+
+                foreach (var obj in engineObjects)
+                {
+                    obj.components.ForEach(c => c.PhysicsTick());
+                }
+
+                PhysicsSimulation.Tick();
+            }
             //ParticleManager.UpdateParticles();
 
             RenderPipeline.Render();
@@ -89,10 +112,11 @@ namespace AssemblyEngine
             Input.OnEvent();
             RenderPipeline.OnEvent();
 
-            return SDL_AppResult.SDL_APP_CONTINUE;
+            return SDL_AppResult.SDL_APP_CONTINUE; 
         }
         static void SDL_AppQuit(nint appstate, SDL_AppResult result){
             RenderPipeline.Dispose();
+            PhysicsSimulation.Dispose();
 
             SDL_Quit();
         }
