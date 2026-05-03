@@ -9,6 +9,8 @@ namespace AssemblyEngine
         public Transform parent;
         public List<Transform> children;
 
+        public Matrix4 transformationMatrix;
+
         public Vector3 localPosition = Vector3.Zero;
         public Quaternion localRotation = Quaternion.Identity;
         public Vector3 localScale = Vector3.One;
@@ -20,12 +22,17 @@ namespace AssemblyEngine
                     return localPosition;
 
                 //Vector3 dir = localPosition;
+                //return (parent.transformationMatrix * transformationMatrix).ExtractTranslation();
                 return parent.position + parent.rotation * localPosition * parent.scale;
             }
             set
             {
                 if (localPosition != value)
                 {
+                    //transformationMatrix = Matrix4.CreateFromQuaternion(localRotation);
+                    //transformationMatrix *= Matrix4.CreateScale(localScale);
+                    //transformationMatrix *= Matrix4.CreateTranslation(localPosition);
+
                     if (parent == null)
                         localPosition = value;
                     else

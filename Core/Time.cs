@@ -22,6 +22,10 @@ namespace AssemblyEngine
         }
         internal static void FixedUpdate()
         {
+            if (time < lastFixedFrameTime)
+            {
+                Console.WriteLine($"We went BACKWARDS in TIME?? now:{time}, earlier:{lastFixedFrameTime}");
+            }
             fixedDeltaTime = time - lastFixedFrameTime;
             lastFixedFrameTime = time;
         }

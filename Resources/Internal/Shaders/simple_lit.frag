@@ -8,7 +8,7 @@ in RenderParams{
 	vec4 lightSpaceFragPos;
 } v_in;
 
-uniform sampler2D uMainTex;
+uniform sampler2D uDiffuse0;
 //uniform sampler2D uNormal;
 //uniform sampler2D uGlossiness;
 //uniform sampler2D uSpecular;
@@ -87,7 +87,7 @@ void main(){
 	vec3 lightDir = normalize(uLightPos0.w == 1 ? -uLightPos0.xyz : (uLightPos0.xyz - v_in.fragPos));
 	vec3 viewDir = normalize(uViewPos - v_in.fragPos);
 	
-	vec3 diffuse = texture(uMainTex, v_in.texCoord).rgb;
+	vec3 diffuse = texture(uDiffuse0, v_in.texCoord).rgb;
 	
 	float bias = 0.001;
 	float normalBias = 0.001;

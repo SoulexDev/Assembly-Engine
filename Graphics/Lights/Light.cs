@@ -1,6 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System.Numerics;
 
 namespace AssemblyEngine.Graphics
 {
@@ -45,7 +44,9 @@ namespace AssemblyEngine.Graphics
         }
         private void DrawDirectionalShadow(List<ModelRenderer> modelRenderers)
         {
-            lightCamera.transform.position = Camera.main.transform.position - transform.forward * 50;
+            Vector3 desiredPosition = Camera.main.transform.position.Floor() - transform.forward * 50;
+
+            lightCamera.transform.position = desiredPosition;
             lightCamera.transform.rotation = transform.rotation;
 
             //draw

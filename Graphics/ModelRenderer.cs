@@ -10,6 +10,10 @@ namespace AssemblyEngine.Graphics
         private Model model;
         public Matrix4 modelMatrix;
 
+        public ModelRenderer()
+        {
+
+        }
         public ModelRenderer(Model model, Matrix4 modelMatrix)
         {
             this.model = model;
@@ -44,6 +48,7 @@ namespace AssemblyEngine.Graphics
             if (model != null && model.meshes.Count == 0)
                 return;
 
+            isDirty = true;
             if (isDirty)
             {
                 if (transform != null)

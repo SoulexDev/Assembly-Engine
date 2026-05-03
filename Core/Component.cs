@@ -43,5 +43,13 @@
         {
 
         }
+        public virtual void OnComponentAdded(Component component)
+        {
+
+        }
+        public virtual void OnComponentRemoved(Component component)
+        {
+
+        }
     }
 }

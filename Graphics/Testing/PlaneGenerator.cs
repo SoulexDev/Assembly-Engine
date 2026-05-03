@@ -19,7 +19,7 @@ namespace AssemblyEngine.Graphics.Testing
             new Vector3(0.0f, 0.0f, 1.0f), //top left - 2[1, 4] 2
             new Vector3(1.0f, 0.0f, 1.0f)  //top right - 3[5] 3
         };
-        public static Plane Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10, float uvScale = 1)
+        public static Model Generate(Texture2D texture, PrimitiveType primitiveType, int widthX = 10, int widthZ = 10, float uvScale = 1)
         {
             Material mat = new Material(ASECore.defaultShader);
             mat.texture2Ds.Add(("uMainTex", texture));
@@ -71,7 +71,7 @@ namespace AssemblyEngine.Graphics.Testing
             Mesh mesh = new Mesh(vertices, indices, primitiveType, BufferUsageHint.StaticDraw, 
                 VertexAttribute.Vector3, VertexAttribute.Vector3, VertexAttribute.Vector2);
 
-            return new Plane(mesh, mat);
+            return new Model((mesh, mat));
         }
     }
 }

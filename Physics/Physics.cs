@@ -58,9 +58,9 @@ namespace AssemblyEngine.Physics
             public float linearDamping;
             public float angularDamping;
 
-            public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.ConserveMomentum;
+            public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.Nonconserving;
 
-            public bool AllowSubstepsForUnconstrainedBodies => true;
+            public bool AllowSubstepsForUnconstrainedBodies => false;
 
             public bool IntegrateVelocityForKinematics => false;
 
@@ -80,8 +80,9 @@ namespace AssemblyEngine.Physics
             }
             public void IntegrateVelocity(System.Numerics.Vector<int> bodyIndices, Vector3Wide position, QuaternionWide orientation, BodyInertiaWide localInertia, System.Numerics.Vector<int> integrationMask, int workerIndex, System.Numerics.Vector<float> dt, ref BodyVelocityWide velocity)
             {
-                velocity.Linear = (velocity.Linear + gravityWideDt) * linearDampingDt;
-                velocity.Angular = velocity.Angular * angularDampingDt;
+                //velocity.Linear = (velocity.Linear + gravityWideDt) * linearDampingDt;
+                //velocity.Angular = velocity.Angular * angularDampingDt;
+                velocity.Linear += gravityWideDt;
             }
             public void PrepareForIntegration(float dt)
             {
@@ -91,20 +92,31 @@ namespace AssemblyEngine.Physics
                 gravityWideDt = Vector3Wide.Broadcast(gravity * dt);
             }
         }
-        private static Simulation simulation;
+        internal static Simulation simulation;
+
         private static ThreadDispatcher threadDispatcher;
         private static BufferPool bufferPool;
-        private static SolveDescription solveDescription;
+
+        internal static TypedIndex boxCollider;
+        internal static TypedIndex sphereCollider;
+        internal static TypedIndex capsuleCollider;
+
         public static void Init()
         {
             threadDispatcher = new ThreadDispatcher(Environment.ProcessorCount);
             bufferPool = new BufferPool();
-            solveDescription = new SolveDescription(1, 2);
-            simulation = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(), solveDescription);
+
+            simulation = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), 
+                new PoseIntegratorCallbacks(new System.Numerics.Vector3(0, -9.81f, 0)), new SolveDescription(8, 1));
         }
         public static void Tick()
         {
-            simulation.Timestep(Time.fixedDeltaTime, threadDispatcher);
+            if (Time.fixedDeltaTime <= 0)
+            {
+                //Console.WriteLine($"Fixed: {Time.fixedDeltaTime}, Time: {Time.time}");
+                Time.fixedDeltaTime = 0.05f;
+            }
+            simulation.Timestep(0.05f, threadDispatcher);
         }
         public static void Dispose()
         {

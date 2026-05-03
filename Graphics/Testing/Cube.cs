@@ -48,7 +48,16 @@ namespace AssemblyEngine.Graphics.Testing
             -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
         };
+        public static Model Generate(Texture2D texture)
+        {
+            Material mat = new Material(ASECore.defaultShader).DisableCullFace();
+            mat.texture2Ds.Add(("uDiffuse0", texture));
 
+            Mesh mesh = new Mesh(vertices, PrimitiveType.Triangles, BufferUsageHint.StaticDraw, 
+                VertexAttribute.Vector3, VertexAttribute.Vector3, VertexAttribute.Vector2);
+
+            return new Model((mesh, mat));
+        }
         //public Cube(Texture2D texture)
         //{
         //    Material mat = new Material(ASECore.defaultShader).DisableCullFace();

@@ -1,6 +1,7 @@
 ﻿using AssemblyEngine.Graphics;
 using Assimp.Unmanaged;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 
 namespace AssemblyEngine
 {
@@ -100,7 +101,12 @@ namespace AssemblyEngine
 
             using (Stream stream = File.OpenRead(filePath))
             {
-                Assimp.Scene scene = importer.ImportFileFromStream(stream, Assimp.PostProcessSteps.Triangulate, fileType);
+                Assimp.PostProcessSteps processFlags =
+                    Assimp.PostProcessSteps.Triangulate |
+                    Assimp.PostProcessSteps.PreTransformVertices |
+                    Assimp.PostProcessSteps.MakeLeftHanded;
+
+                Assimp.Scene scene = importer.ImportFileFromStream(stream, processFlags, fileType);
 
                 if (scene == null || ((scene.SceneFlags & Assimp.SceneFlags.Incomplete) != 0) || scene.RootNode == null)
                 {
@@ -111,23 +117,122 @@ namespace AssemblyEngine
 
                 model = new Model();
 
-                ProcessNode(scene.RootNode, scene, ref model);
+                ProcessNode(filePath, scene.RootNode, scene, ref model);
             }
             return true;
         }
-        private static void ProcessNode(Assimp.Node node, Assimp.Scene scene, ref Model model)
+        public static bool LoadResource(out List<ModelRenderer> modelRenderers, string filePath)
+        {
+            filePath = Path.Combine(ASECore.AssetsPath, filePath);
+
+            Console.WriteLine("Loading model " + filePath);
+
+            string fileType = Path.GetExtension(filePath);
+
+            using (Stream stream = File.OpenRead(filePath))
+            {
+                Console.WriteLine(fileType);
+                Assimp.Scene scene = importer.ImportFileFromStream(stream, Assimp.PostProcessSteps.Triangulate, fileType);
+
+                if (scene == null || ((scene.SceneFlags & Assimp.SceneFlags.Incomplete) != 0) || scene.RootNode == null)
+                {
+                    Console.WriteLine($"Failed to import model {filePath}");
+                    modelRenderers = null;
+                    return false;
+                }
+
+                modelRenderers = new List<ModelRenderer>();
+
+                ProcessScene(filePath, scene.RootNode, scene, modelRenderers);
+            }
+            return true;
+        }
+        public static bool LoadResource(out EngineObject sceneObject, string filePath)
+        {
+            filePath = Path.Combine(ASECore.AssetsPath, filePath);
+
+            Console.WriteLine("Loading model " + filePath);
+
+            string fileType = Path.GetExtension(filePath);
+
+            using (Stream stream = File.OpenRead(filePath))
+            {
+                Console.WriteLine(fileType);
+                Assimp.Scene scene = importer.ImportFileFromStream(stream, Assimp.PostProcessSteps.Triangulate, fileType);
+
+                if (scene == null || ((scene.SceneFlags & Assimp.SceneFlags.Incomplete) != 0) || scene.RootNode == null)
+                {
+                    Console.WriteLine($"Failed to import model {filePath}");
+                    sceneObject = null;
+                    return false;
+                }
+
+                sceneObject = EngineObjectFactory.Instantiate();
+
+                ProcessScene(filePath, scene.RootNode, scene, sceneObject);
+            }
+            return true;
+        }
+        private static void ProcessScene(string filePath, Assimp.Node node, Assimp.Scene scene, EngineObject parentObject)
+        {
+            EngineObject childObject = EngineObjectFactory.Instantiate();
+            node.Transform.Decompose(out Assimp.Vector3D scale, out Assimp.Quaternion rotation, out Assimp.Vector3D position);
+
+            childObject.transform.SetParent(parentObject.transform);
+            childObject.transform.localPosition = new Vector3(position.X, position.Y, position.Z);
+            childObject.transform.localScale = new Vector3(scale.X, scale.Y, scale.Z);
+            childObject.transform.localRotation = new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
+
+            Model model = new Model();
+
+            ModelRenderer modelRenderer = childObject.AddComponent<ModelRenderer>("Model Renderer");
+            modelRenderer.SetModel(model);
+
+            for (int i = 0; i < node.MeshCount; i++)
+            {
+                Assimp.Mesh mesh = scene.Meshes[node.MeshIndices[i]];
+                model.meshes.Add(ProcessMesh(filePath, mesh, scene));
+            }
+            for (int i = 0; i < node.ChildCount; i++)
+            {
+                ProcessScene(filePath, node.Children[i], scene, childObject);
+            }
+        }
+        private static void ProcessScene(string filePath, Assimp.Node node, Assimp.Scene scene, List<ModelRenderer> modelRenderers)
+        {
+            Assimp.Matrix4x4 mat4 = Assimp.Matrix4x4.FromScaling(new Assimp.Vector3D(0.01f));
+            for (int i = 0; i < node.MeshCount; i++)
+            {
+                Assimp.Mesh mesh = scene.Meshes[node.MeshIndices[i]];
+                Model model = new Model(ProcessMesh(filePath, mesh, scene));
+
+                node.Transform *= mat4;
+                node.Transform.Decompose(out Assimp.Vector3D scale, out Assimp.Quaternion rotation, out Assimp.Vector3D position);
+
+                Matrix4 modelMatrix = Matrix4.CreateFromQuaternion(new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W));
+                modelMatrix *= Matrix4.CreateScale(new Vector3(scale.X, scale.Y, scale.Z));
+                modelMatrix *= Matrix4.CreateTranslation(new Vector3(position.X, position.Y, position.Z));
+
+                modelRenderers.Add(new ModelRenderer(model, Matrix4.Identity));
+            }
+            for (int i = 0; i < node.ChildCount; i++)
+            {
+                ProcessScene(filePath, node.Children[i], scene, modelRenderers);
+            }
+        }
+        private static void ProcessNode(string filePath, Assimp.Node node, Assimp.Scene scene, ref Model model)
         { 
             for (int i = 0; i < node.MeshCount; i++)
             {
                 Assimp.Mesh mesh = scene.Meshes[node.MeshIndices[i]];
-                model.meshes.Add(ProcessMesh(mesh, scene));
+                model.meshes.Add(ProcessMesh(filePath, mesh, scene));
             }
             for (int i = 0; i < node.ChildCount; i++)
             {
-                ProcessNode(node.Children[i], scene, ref model);
+                ProcessNode(filePath, node.Children[i], scene, ref model);
             }
         }
-        private static (Mesh, Material) ProcessMesh(Assimp.Mesh assimpMesh, Assimp.Scene scene)
+        private static (Mesh, Material) ProcessMesh(string filePath, Assimp.Mesh assimpMesh, Assimp.Scene scene)
         {
             //float[] vertices = new float[mesh.VertexCount];
             List<float> vertices = new List<float>();
@@ -205,8 +310,8 @@ namespace AssemblyEngine
                 List<(string, Texture2D)> textures = new List<(string, Texture2D)>();
 
                 Assimp.Material assimpMat = scene.Materials[assimpMesh.MaterialIndex];
-                LoadMaterialTextures(textures, assimpMat, Assimp.TextureType.Diffuse, "uDiffuse");
-                LoadMaterialTextures(textures, assimpMat, Assimp.TextureType.Specular, "uSpecular");
+                LoadMaterialTextures(filePath, textures, assimpMat, Assimp.TextureType.Diffuse, "uDiffuse");
+                //LoadMaterialTextures(textures, assimpMat, Assimp.TextureType.Specular, "uSpecular");
 
                 mat.texture2Ds.AddRange(textures);
             }
@@ -217,14 +322,24 @@ namespace AssemblyEngine
 
             return (mesh, mat);
         }
-        private static void LoadMaterialTextures(List<(string, Texture2D)> textures, Assimp.Material mat, Assimp.TextureType type, string textureName)
+        private static void LoadMaterialTextures(string filePath, List<(string, Texture2D)> textures, Assimp.Material mat, Assimp.TextureType type, string textureName)
         {
             for (int i = 0; i < mat.GetMaterialTextureCount(type); i++)
             {
                 mat.GetMaterialTexture(type, i, out Assimp.TextureSlot assimpTexture);
                 //TODO: update texture to allow per U/V wrap modes
-                textures.Add((textureName + i, new Texture2D(assimpTexture.FilePath, texWrapModeBindings[assimpTexture.WrapModeU])));
-                Console.WriteLine(assimpTexture.FilePath);
+                //Console.WriteLine(assimpTexture.FilePath);
+                //Console.WriteLine(filePath);
+
+                //string fileFolder = Path.GetDirectoryName(filePath);
+                //string fileName = assimpTexture.FilePath.Replace(ASECore.RawPath, "");
+                string texturePath = Path.Combine(Path.GetDirectoryName(filePath), assimpTexture.FilePath);
+
+                Console.WriteLine(texturePath);
+                LoadResource(out Texture2D tex, texturePath);
+
+                //texWrapModeBindings[assimpTexture.WrapModeU]
+                textures.Add((textureName + i, tex));
             }
         }
         //private static string PreprocessShaderContent(string shaderRead)
