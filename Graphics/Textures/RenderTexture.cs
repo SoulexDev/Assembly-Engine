@@ -3,7 +3,7 @@
 namespace AssemblyEngine.Graphics
 {
     public enum RenderTextureType { Normal, Depth }
-    public class RenderTexture : IDisposable
+    public class RenderTexture
     {
         private uint fbo;
         private uint rbo;
@@ -76,25 +76,26 @@ namespace AssemblyEngine.Graphics
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
         //disposal
-        private bool _disposed;
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        public virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                GL.DeleteFramebuffers(1, ref fbo);
-                if (usesRBO)
-                    GL.DeleteRenderbuffers(1, ref rbo);
-            }
-        }
-        ~RenderTexture()
-        {
-            Dispose(false);
-        }
+        //idk what im doing
+        //private bool _disposed;
+        //public void Dispose()
+        //{
+        //    Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
+        //public virtual void Dispose(bool disposing)
+        //{
+        //    if (!_disposed)
+        //    {
+        //        GL.DeleteFramebuffers(1, ref fbo);
+        //        if (usesRBO)
+        //            GL.DeleteRenderbuffers(1, ref rbo);
+        //    }
+        //}
+        //~RenderTexture()
+        //{
+        //    Dispose(false);
+        //}
 
         public static implicit operator uint(RenderTexture rt) => rt.texture.id;
         //public static implicit operator Texture2D(RenderTexture rt) => rt.texture;

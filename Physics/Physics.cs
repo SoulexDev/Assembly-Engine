@@ -97,9 +97,8 @@ namespace AssemblyEngine.Physics
         private static ThreadDispatcher threadDispatcher;
         private static BufferPool bufferPool;
 
-        internal static TypedIndex boxCollider;
-        internal static TypedIndex sphereCollider;
-        internal static TypedIndex capsuleCollider;
+        public static float secondsPerTick = 1.0f / 50.0f;
+        public static long millisecondsPerTick => (long)(secondsPerTick * 1000);
 
         public static void Init()
         {
@@ -114,9 +113,9 @@ namespace AssemblyEngine.Physics
             if (Time.fixedDeltaTime <= 0)
             {
                 //Console.WriteLine($"Fixed: {Time.fixedDeltaTime}, Time: {Time.time}");
-                Time.fixedDeltaTime = 0.05f;
+                Time.fixedDeltaTime = secondsPerTick;
             }
-            simulation.Timestep(0.05f, threadDispatcher);
+            simulation.Timestep(secondsPerTick, threadDispatcher);
         }
         public static void Dispose()
         {

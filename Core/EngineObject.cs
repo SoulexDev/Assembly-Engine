@@ -2,6 +2,8 @@
 {
     public sealed class EngineObject
     {
+        public string name = "Null Name";
+
         public Transform transform;
         internal List<Component> components = new List<Component>();
 
@@ -10,10 +12,21 @@
 
         internal EngineObject()
         {
-            transform = new Transform();
+            name = "Engine Object";
+            transform = new Transform(this);
+        }
+        internal EngineObject(string name)
+        {
+            this.name = name;
+            transform = new Transform(this);
         }
         public T AddComponent<T>(string name) where T : Component
         {
+            if (components.Exists(c => c.name == name))
+            {
+                Console.Write($"Components with name {name} already exists.");
+                return null;
+            }
             T component = (T)Activator.CreateInstance(typeof(T));
 
             component.name = name;

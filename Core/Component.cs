@@ -51,5 +51,9 @@
         {
 
         }
+        public virtual void DrawInspector()
+        {
+
+        }
     }
 }

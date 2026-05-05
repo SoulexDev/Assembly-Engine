@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using BepuPhysics;
+using OpenTK.Mathematics;
 
 namespace AssemblyEngine
 {
@@ -6,14 +7,28 @@ namespace AssemblyEngine
     {
         public bool isDirty = true;
 
+        public EngineObject engineObject;
+
         public Transform parent;
-        public List<Transform> children;
+        public List<Transform> children = new List<Transform>();
 
         public Matrix4 transformationMatrix;
+
+        public delegate void TransformChanged();
+        public event TransformChanged OnTransformChanged;
 
         public Vector3 localPosition = Vector3.Zero;
         public Quaternion localRotation = Quaternion.Identity;
         public Vector3 localScale = Vector3.One;
+
+        internal Transform()
+        {
+
+        }
+        internal Transform(EngineObject engineObject)
+        {
+            this.engineObject = engineObject;
+        }
         public Vector3 position
         {
             get
@@ -39,6 +54,8 @@ namespace AssemblyEngine
                         localPosition = value - parent.position;
 
                     isDirty = true;
+
+                    OnTransformChanged?.Invoke();
                 }
             }
         }
@@ -62,6 +79,8 @@ namespace AssemblyEngine
 
                     isDirty = true;
                 }
+
+                OnTransformChanged?.Invoke();
             }
         }
         public Vector3 scale
@@ -84,6 +103,8 @@ namespace AssemblyEngine
 
                     isDirty = true;
                 }
+
+                OnTransformChanged?.Invoke();
             }
         }
         public Vector3 right
@@ -103,6 +124,11 @@ namespace AssemblyEngine
         }
         public void SetParent(Transform transform, bool keepWorld = false)
         {
+            if (transform == this)
+            {
+                Console.WriteLine("Cannot set transform as parent of self");
+                return;
+            }
             //if (transform == null && parent == null)
             //    return;
             //parent = transform;
@@ -122,6 +148,8 @@ namespace AssemblyEngine
                 else
                 {
                     parent = transform;
+                    transform.children.Add(this);
+
                     localPosition = Vector3.Zero;
                     localRotation = Quaternion.Identity;
                     localScale = Vector3.One;
@@ -135,6 +163,7 @@ namespace AssemblyEngine
                     Quaternion worldRot = rotation;
                     Vector3 worldScale = scale;
 
+                    parent.children.Remove(this);
                     parent = null;
 
                     position = worldPos;
@@ -150,6 +179,10 @@ namespace AssemblyEngine
         public void Rotate(Vector3 axis, float angle)
         {
             rotation *= Quaternion.FromAxisAngle(axis, angle * (MathF.PI / 180.0f));
+        }
+        public static implicit operator RigidPose(Transform transform)
+        {
+            return new RigidPose((System.Numerics.Vector3)transform.position, (System.Numerics.Quaternion)transform.rotation);
         }
     }
 }

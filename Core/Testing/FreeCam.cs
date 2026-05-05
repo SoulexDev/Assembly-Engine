@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Hexa.NET.ImGui;
+using OpenTK.Mathematics;
 using static SDL3.SDL;
 
 namespace AssemblyEngine.Testing
@@ -8,13 +9,19 @@ namespace AssemblyEngine.Testing
         private Camera camera;
         private float mouseX, mouseY;
 
+        public float speed = 8;
+        public float fastSpeedMultiplier = 2;
+
         public override void Init()
         {
-            camera = new Camera();
+            camera = engineObject.AddComponent<Camera>("camera");
             Camera.main = camera;
         }
         public override void Update()
         {
+            if (!Input.IsMouseButtonPressed(SDL_MouseButtonFlags.SDL_BUTTON_RMASK))
+                return;
+
             Vector3 moveVector = Vector3.Zero;
 
             mouseX += Input.mouseDeltaX * 360.0f;
@@ -22,19 +29,24 @@ namespace AssemblyEngine.Testing
 
             mouseY = MathHelper.Clamp(mouseY, -89.0f, 89.0f);
 
-            camera.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegToRad * mouseX);
-            camera.transform.rotation *= Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * mouseY);
+            transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, MathHelper.DegToRad * mouseX);
+            transform.rotation *= Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * mouseY);
 
-            moveVector = camera.transform.right * Input.horizontal + camera.transform.up * Input.longitudinal + camera.transform.forward * Input.vertical;
+            moveVector = transform.right * Input.horizontal + transform.up * Input.longitudinal + transform.forward * Input.vertical;
             moveVector.Normalize();
 
-            moveVector *= 8;
+            moveVector *= speed;
 
             if (Input.IsKeyPressed(SDL_Scancode.SDL_SCANCODE_LSHIFT))
-                moveVector *= 2;
+                moveVector *= fastSpeedMultiplier;
 
             if (moveVector.Length > 0)
-                camera.transform.position += moveVector * Time.deltaTime;
+                transform.position += moveVector * Time.deltaTime;
+        }
+        public override void DrawInspector()
+        {
+            ImGui.SliderFloat("Speed", ref speed, 0.01f, 25);
+            ImGui.SliderFloat("Fast Speed Multiplier", ref fastSpeedMultiplier, 1, 4);
         }
     }
 }

@@ -167,7 +167,7 @@ namespace AssemblyEngine
                     return false;
                 }
 
-                sceneObject = EngineObjectFactory.Instantiate();
+                sceneObject = EngineObjectFactory.Instantiate(scene.RootNode.Name);
 
                 ProcessScene(filePath, scene.RootNode, scene, sceneObject);
             }
@@ -175,7 +175,7 @@ namespace AssemblyEngine
         }
         private static void ProcessScene(string filePath, Assimp.Node node, Assimp.Scene scene, EngineObject parentObject)
         {
-            EngineObject childObject = EngineObjectFactory.Instantiate();
+            EngineObject childObject = EngineObjectFactory.Instantiate(node.Name);
             node.Transform.Decompose(out Assimp.Vector3D scale, out Assimp.Quaternion rotation, out Assimp.Vector3D position);
 
             childObject.transform.SetParent(parentObject.transform);

@@ -23,10 +23,10 @@ namespace AssemblyEngine.Graphics
 
             RenderPipeline.AddModelRenderer(this);
         }
-        ~ModelRenderer()
-        {
-            RenderPipeline.RemoveModelRenderer(this);
-        }
+        //~ModelRenderer()
+        //{
+        //    RenderPipeline.RemoveModelRenderer(this);
+        //}
         public override void Init()
         {
             RenderPipeline.AddModelRenderer(this);
@@ -53,8 +53,8 @@ namespace AssemblyEngine.Graphics
             {
                 if (transform != null)
                 {
-                    Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-                    modelMatrix *= Matrix4.CreateScale(transform.scale);
+                    Matrix4.CreateScale(transform.scale, out modelMatrix);
+                    modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
                     modelMatrix *= Matrix4.CreateTranslation(transform.position);
                 }
 
@@ -106,12 +106,13 @@ namespace AssemblyEngine.Graphics
             if (model != null && model.meshes.Count == 0)
                 return;
 
+            isDirty = true;
             if (isDirty)
             {
                 if (transform != null)
                 {
-                    Matrix4.CreateFromQuaternion(transform.rotation, out modelMatrix);
-                    modelMatrix *= Matrix4.CreateScale(transform.scale);
+                    Matrix4.CreateScale(transform.scale, out modelMatrix);
+                    modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
                     modelMatrix *= Matrix4.CreateTranslation(transform.position);
                 }
 

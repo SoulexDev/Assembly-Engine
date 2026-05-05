@@ -1,14 +1,19 @@
-﻿using AssemblyEngine.Graphics;
+﻿#define EDITOR
+
+using AssemblyEngine.Graphics;
 using AssemblyEngine.Graphics.Testing;
+using AssemblyEngine.GUI;
 using AssemblyEngine.Physics;
 using AssemblyEngine.Testing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using static SDL3.SDL;
 
 namespace AssemblyEngine
 {
+    //TODO: for soup jam, we need scenes, proper internal/external render pipeline components, audio, more robust physics, sprites, particles, billboards
     public class ASECore
     {
         public static string AssetsPath;
@@ -43,12 +48,16 @@ namespace AssemblyEngine
         {
             return SDL_EnterAppMainCallbacks(argc, argv, SDL_AppInit, SDL_AppIterate, SDL_AppEvent, SDL_AppQuit);
         }
-        static SDL_AppResult SDL_AppInit(nint appState, int argc, nint argv){
+        static SDL_AppResult SDL_AppInit(nint appState, int argc, nint argv)
+        {
             //initialize core functionalities
             if (!RenderPipeline.Init())
             {
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
+            GUIManager.Init();
+            GUIManager.EnableGUI();
+
             fixedStepTimer = new Stopwatch();
             fixedStepTimer.Start();
 
@@ -70,10 +79,9 @@ namespace AssemblyEngine
 
             #region deccer
 
-            
             ResourceLoader.LoadResource(out Texture2D testTex, "internal/textures/prototype_light.png");
 
-            EngineObject ground = EngineObjectFactory.Instantiate();
+            EngineObject ground = EngineObjectFactory.Instantiate("Ground");
 
             ModelRenderer m = ground.AddComponent<ModelRenderer>("model renderer");
             m.SetModel(Cube.Generate(testTex));
@@ -83,8 +91,8 @@ namespace AssemblyEngine
 
             for (int i = 0; i < 16; i++)
             {
-                EngineObject cube = EngineObjectFactory.Instantiate();
-                cube.transform.position = Vector3.UnitY * (i + 128) * 2 + ASERandom.InSphere(1);
+                EngineObject cube = EngineObjectFactory.Instantiate($"cube {i}");
+                cube.transform.position = Vector3.UnitY * (i + 16) * 2 + ASERandom.InSphere(1);
                 cube.AddComponent<ModelRenderer>("model renderer").SetModel(Cube.Generate(testTex));
                 cube.AddComponent<BoxCollider>("collider");
                 cube.AddComponent<RigidBody>("rigidbody");
@@ -92,31 +100,24 @@ namespace AssemblyEngine
 
             //ResourceLoader.LoadResource(out Model deccerCubes, "Deccer/SM_Deccer_Cubes_Textured_Complex.fbx");
             //ResourceLoader.LoadResource(out EngineObject deccerObj, "Deccer/SM_Deccer_Cubes_Textured_Complex.fbx");
-            //deccerObj.AddComponent<BoxCollider>("box collider");
-            //deccerObj.AddComponent<RigidBody>("rigidbody");
 
             //deccerObj.transform.scale = new Vector3(0.01f);
 
-            //ResourceLoader.LoadResource(out Texture2D deccerTex, "Deccer/T_Atlas.png");
-
-            //ModelRenderer modelRenderer = new ModelRenderer(deccerCubes, Matrix4.Identity * Matrix4.CreateScale(0.0001f));
-
-            //Material deccerMat = new Material(defaultShader);
-            //deccerMat.texture2Ds.Add();
-
-            //modelRenderer.SetMaterial(deccerMat);
-
             #endregion
 
-            EngineObject obj = EngineObjectFactory.Instantiate();
-            obj.AddComponent<FreeCam>("free cam 1");
+            EngineObject freeCam = EngineObjectFactory.Instantiate("Free Cam");
+            freeCam.AddComponent<FreeCam>("free cam 1");
+
+            EngineObject freeCamBaby = EngineObjectFactory.Instantiate("Fuck you father");
+            freeCamBaby.transform.SetParent(freeCam.transform);
 
             //ParticleManager.EmitParticles(particlesTex);
 
             OnAppInit?.Invoke();
             return SDL_AppResult.SDL_APP_CONTINUE;
         }
-        static SDL_AppResult SDL_AppIterate(nint appstate){
+        static SDL_AppResult SDL_AppIterate(nint appstate)
+        {
             Input.SetCurrentState();
 
             Time.Update();
@@ -131,9 +132,9 @@ namespace AssemblyEngine
                 obj.components.ForEach(c => c.LateUpdate());
             }
 
-            if (fixedStepTimer.ElapsedMilliseconds + timerOffset > 20)
+            if (fixedStepTimer.ElapsedMilliseconds + timerOffset > PhysicsSimulation.millisecondsPerTick)
             {
-                timerOffset = fixedStepTimer.ElapsedMilliseconds + timerOffset - 20;
+                timerOffset = fixedStepTimer.ElapsedMilliseconds + timerOffset - PhysicsSimulation.millisecondsPerTick;
                 fixedStepTimer.Restart();
 
                 Time.FixedUpdate();
@@ -152,13 +153,16 @@ namespace AssemblyEngine
             //Input.SetLastState();
             return SDL_AppResult.SDL_APP_CONTINUE;
         }
-        unsafe static SDL_AppResult SDL_AppEvent(nint appstate, SDL_Event* sdlEvent){
+        unsafe static SDL_AppResult SDL_AppEvent(nint appstate, SDL_Event* sdlEvent)
+        {
             Input.OnEvent();
             RenderPipeline.OnEvent();
+            GUIManager.HandleEvents(sdlEvent);
 
-            return SDL_AppResult.SDL_APP_CONTINUE; 
+            return SDL_AppResult.SDL_APP_CONTINUE;
         }
-        static void SDL_AppQuit(nint appstate, SDL_AppResult result){
+        static void SDL_AppQuit(nint appstate, SDL_AppResult result)
+        {
             RenderPipeline.Dispose();
             PhysicsSimulation.Dispose();
 

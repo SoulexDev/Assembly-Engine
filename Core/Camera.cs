@@ -3,11 +3,9 @@
 namespace AssemblyEngine
 {
     public enum CameraProjectionType { Perspective, Orthographic }
-    public sealed class Camera
+    public sealed class Camera : Component
     {
         public static Camera main;
-
-        public Transform transform;
 
         public float fov;
         public float orthoWidth;
@@ -19,10 +17,8 @@ namespace AssemblyEngine
         public Matrix4 viewMatrix;
         public Matrix4 projectionMatrix;
 
-        public Camera()
+        public override void Init()
         {
-            transform = new Transform();
-
             fov = 90.0f;
             orthoWidth = 16.0f;
             orthoHeight = 9.0f;
@@ -31,26 +27,26 @@ namespace AssemblyEngine
 
             cameraProjectionType = CameraProjectionType.Perspective;
         }
-        public Camera(float fov = 90.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
+        public Camera InitializeParameters(float fov = 90.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
         {
-            transform = new Transform();
-
             this.fov = fov;
             this.nearPlane = nearPlane;
             this.farPlane = farPlane;
 
             cameraProjectionType = CameraProjectionType.Perspective;
-        }
-        public Camera(float orthoWidth = 16.0f, float orthoHeight = 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
-        {
-            transform = new Transform();
 
+            return this;
+        }
+        public Camera InitializeParameters(float orthoWidth = 16.0f, float orthoHeight = 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
+        {
             this.orthoWidth = orthoWidth;
             this.orthoHeight = orthoHeight;
             this.nearPlane = nearPlane;
             this.farPlane = farPlane;
 
             cameraProjectionType = CameraProjectionType.Orthographic;
+
+            return this;
         }
         public void SetMatrices()
         {

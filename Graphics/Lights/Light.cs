@@ -4,26 +4,39 @@ using OpenTK.Mathematics;
 namespace AssemblyEngine.Graphics
 {
     public enum LightType { Directional, Point, Spot, Area }
-    public class Light
+    public sealed class Light : Component
     {
-        public Transform transform;
         public LightType lightType;
         
         public Camera lightCamera;
         public RenderTexture shadowTex;
 
-        public Light(int shadowResolution)
+        public override void Init()
         {
-            transform = new Transform();
-
-            shadowTex = new RenderTexture(
-                shadowResolution, shadowResolution, 
-                RenderTextureType.Depth, TextureWrapMode.ClampToBorder, 
+            shadowTex = new RenderTexture(1024, 1024,
+                RenderTextureType.Depth, TextureWrapMode.ClampToBorder,
                 TextureMinFilter.Linear, TextureMagFilter.Linear);
 
-            lightCamera = new Camera(50, 50, 1f, 100.0f);
+            lightCamera = engineObject.AddComponent<Camera>("light camera").InitializeParameters(50, 50, 1, 1000);
 
             lightType = LightType.Directional;
+
+            RenderPipeline.lights.Add(this);
+        }
+        public override void OnDestroy()
+        {
+            RenderPipeline.lights.Remove(this);
+        }
+        public Light InitializeParameters(int shadowResolution)
+        {
+            shadowTex = new RenderTexture(
+                shadowResolution, shadowResolution,
+                RenderTextureType.Depth, TextureWrapMode.ClampToBorder,
+                TextureMinFilter.Linear, TextureMagFilter.Linear);
+
+            lightType = LightType.Directional;
+
+            return this;
         }
         public void DrawShadows(List<ModelRenderer> modelRenderers)
         {

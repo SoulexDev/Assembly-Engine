@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using AssemblyEngine.UI;
+using AssemblyEngine.GUI;
 
 namespace AssemblyEngine.Graphics
 {
@@ -61,7 +62,11 @@ namespace AssemblyEngine.Graphics
             SkyboxMesh.Create();
             QuadMesh.Create();
 
-            lights.Add(new Light(2048));
+            EngineObject sun = EngineObjectFactory.Instantiate("Sun");
+            //TODO: special internal stuff for rendering to allow users to interface with the rendering system in a managable way
+            //users shouldn't have to set the light resolution everytime. it should be global. they should still be able to change the resolution per light, though
+            //there should be camera components and interal camera. camera components interface with internal cameras
+            sun.AddComponent<Light>("directional light").InitializeParameters(2048);
 
             postProcessBuffers = (
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal),
@@ -164,6 +169,8 @@ namespace AssemblyEngine.Graphics
             {
                 canvas.Draw();
             }
+
+            GUIManager.Render();
 
             SDL_GL_SwapWindow(window);
         }

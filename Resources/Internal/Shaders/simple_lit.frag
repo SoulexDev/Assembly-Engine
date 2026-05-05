@@ -64,8 +64,7 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 	float noise = fract(gl_FragCoord.x + gl_FragCoord.y) + interleaved_gradient_noise(gl_FragCoord.xy * gl_FragCoord.yx);
 	float d = fragDepth - bias;
 	float p = get_blocker_dist(noise, projCoords.xy, d, sampleCount);
-	p = ((d - p) / p) * 32;
-	p = max(p, 2.0);
+	p = max(((d - p) / p) * 128, 1.0);
 
 	float shadow = 0.0;
     for (int i = 0; i < sampleCount; i++)
@@ -73,10 +72,11 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 		vec2 samplePoint = projCoords.xy + vogel_disk_sample(i, sampleCount, uTime / max(noise, 0.01)) * texelSize * p;
         
 		float lightDepthPoint = texture(uShadowTex0, to_pixel_point(samplePoint, 2048.0)).r;
-		float lightDepthLinear = texture(uShadowTex0, samplePoint).r;
-		float lightDepth = max(lightDepthPoint, lightDepthLinear);
+		//float lightDepthLinear = texture(uShadowTex0, samplePoint).r;
+		//float lightDepth = max(lightDepthPoint, lightDepthLinear);
+		//lightDepth = lightDepthPoint;
 
-		shadow += fragDepth - bias * p * 0.5 > lightDepth ? 0.0 : 1.0;
+		shadow += fragDepth - bias * p * 0.5 > lightDepthPoint ? 0.0 : 1.0;
     }
 	return shadow / float(sampleCount);
 }
@@ -90,13 +90,13 @@ void main(){
 	vec3 diffuse = texture(uDiffuse0, v_in.texCoord).rgb;
 	
 	float bias = 0.001;
-	float normalBias = 0.001;
+	float normalBias = 0.003;
 	float finalBias = max((1.0 - dot(normal, lightDir)) * normalBias, bias);
-	//finalBias = gl_FrontFacing ? finalBias : 0.0;
+	//finalBias = gl_FrontFacing ? finalBias : 0.002;
 	
-	float nl = dot(normal, lightDir) * 0.5 + 0.5;
-	nl *= nl;
-	float shadow = (calculate_shadow(v_in.lightSpaceFragPos, finalBias) * nl + 0.2);
+	float nl = max(dot(normal, lightDir), 0);
+	//nl *= nl;
+	float shadow = (min(calculate_shadow(v_in.lightSpaceFragPos, finalBias), nl) + 0.2);
 	shadow = min(shadow, 1.0);
 
 	FragColor = vec4(diffuse * shadow, 1.0);

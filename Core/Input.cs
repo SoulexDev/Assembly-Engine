@@ -66,6 +66,11 @@ namespace AssemblyEngine
         {
 
         }
+        public static bool IsMouseButtonPressed(SDL_MouseButtonFlags button)
+        {
+            SDL_MouseButtonFlags buttonFlags = SDL_GetMouseState(out _, out _);
+            return (buttonFlags & button) != 0;
+        }
         public static bool GetKeyDown(SDL_Scancode key)
         {
             return SDL_GetKeyboardState()[(int)key];
