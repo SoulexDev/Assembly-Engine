@@ -24,6 +24,7 @@ The Assembly Engine is the in-house engine being dveloped by The Dev Assembly. I
 * Simple mesh api
 * Resource loading(limited)
 * Penumbra shadows
+* Physics(WIP)
 
 It's currently capable enough to create what is present in the game folder(a small WIP voxel demo).
 
@@ -34,7 +35,6 @@ Currently, I am looking to implement these features -
 * Various lighting methods(npr and pbr models)
 * Volumetric rendering
 * 2D render pipeline
-* Simple Physics
 * ECS
 * Audio
 * Various post effects
