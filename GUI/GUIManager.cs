@@ -1,4 +1,5 @@
 ﻿using AssemblyEngine.Graphics;
+using AssemblyEngine.SceneManagement;
 using Hexa.NET.ImGui;
 using Hexa.NET.ImGui.Backends.OpenGL3;
 using Hexa.NET.ImGui.Backends.SDL3;
@@ -9,10 +10,12 @@ namespace AssemblyEngine.GUI
 {
     public class GUIManager
     {
+        public static SceneViewGUI sceneViewGui;
+
         private static List<GUIWindow> guiWindows = new List<GUIWindow>();
         private static ImGuiContextPtr imguiContextPtr;
 
-        private static bool guiEnabled = false;
+        public static bool guiEnabled { get; private set; }
 
         public static void Init()
         {
@@ -26,10 +29,12 @@ namespace AssemblyEngine.GUI
 
             ImGui.StyleColorsDark();
             SetStyle();
-
+            
             ImGuiImplSDL3.SetCurrentContext(imguiContextPtr);
             unsafe
             {
+                //ImGui.ImGui_ImplSDL2_InitForOpenGL(RenderPipeline.window, RenderPipeline.glContext);
+
                 if (!ImGuiImplSDL3.InitForOpenGL(new SDLWindowPtr { Handle = (SDLWindow*)RenderPipeline.window.ToPointer() }, RenderPipeline.glContext.ToPointer()))
                 {
                     Console.WriteLine("ImGui unable to initialize for SDL3");
@@ -42,9 +47,11 @@ namespace AssemblyEngine.GUI
                 Console.WriteLine("ImGui unable to initialize for OpenGL");
             }
 
+
             //testing
             HierarchyGUI hierarchyGUI = new HierarchyGUI();
             InspectorGUI inspectorGUI = new InspectorGUI();
+            sceneViewGui = new SceneViewGUI();
         }
         public static void EnableGUI()
         {
@@ -56,6 +63,7 @@ namespace AssemblyEngine.GUI
         }
         public static unsafe void HandleEvents(SDL_Event* sdlEvent)
         {
+            //ImGui.ImGui_ImplSDL2_ProcessEvent((IntPtr)sdlEvent);
             ImGuiImplSDL3.ProcessEvent(new SDLEventPtr((SDLEvent*)sdlEvent));
         }
         public static void Render()
@@ -65,6 +73,7 @@ namespace AssemblyEngine.GUI
 
             ImGuiImplOpenGL3.NewFrame();
             ImGuiImplSDL3.NewFrame();
+            //ImGui.ImGui_ImplSDL2_NewFrame();
             ImGui.NewFrame();
             ImGui.DockSpaceOverViewport(ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
 
@@ -72,28 +81,32 @@ namespace AssemblyEngine.GUI
             {
                 if (ImGui.BeginMenu("File"))
                 {
-                    if (ImGui.MenuItem("New"))
+                    if (ImGui.MenuItem("Save"))
                     {
-
+                        SceneManager.SaveScene(SceneManager.activeScene);
                     }
-                    if (ImGui.MenuItem("Open"))
-                    {
+                    //if (ImGui.MenuItem("New"))
+                    //{
 
-                    }
-                    if (ImGui.MenuItem("Open Recent"))
-                    {
+                    //}
+                    //if (ImGui.MenuItem("Open"))
+                    //{
 
-                    }
+                    //}
+                    //if (ImGui.MenuItem("Open Recent"))
+                    //{
+
+                    //}
                     ImGui.EndMenu();
                 }
-                if (ImGui.BeginMenu("Options"))
-                {
-                    if (ImGui.MenuItem("Addons"))
-                    {
+                //if (ImGui.BeginMenu("Options"))
+                //{
+                //    if (ImGui.MenuItem("Addons"))
+                //    {
 
-                    }
-                    ImGui.EndMenu();
-                }
+                //    }
+                //    ImGui.EndMenu();
+                //}
                 ImGui.EndMainMenuBar();
             }
             foreach (GUIWindow guiWindow in guiWindows)

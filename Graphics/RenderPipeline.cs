@@ -62,12 +62,6 @@ namespace AssemblyEngine.Graphics
             SkyboxMesh.Create();
             QuadMesh.Create();
 
-            EngineObject sun = EngineObjectFactory.Instantiate("Sun");
-            //TODO: special internal stuff for rendering to allow users to interface with the rendering system in a managable way
-            //users shouldn't have to set the light resolution everytime. it should be global. they should still be able to change the resolution per light, though
-            //there should be camera components and interal camera. camera components interface with internal cameras
-            sun.AddComponent<Light>("directional light").InitializeParameters(2048);
-
             postProcessBuffers = (
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal),
                 new RenderTexture(Engine.screenWidth, Engine.screenHeight, RenderTextureType.Normal));
@@ -86,7 +80,7 @@ namespace AssemblyEngine.Graphics
                 ("internal/shaders/skybox/skybox", ShaderType.VertexShader),
                 ("internal/shaders/skybox/skybox_procedural", ShaderType.FragmentShader));
 
-            Camera.main = new Camera();
+            //Camera.main = new Camera();
             //Camera.main = sunCam;
 
             return true;
@@ -127,7 +121,13 @@ namespace AssemblyEngine.Graphics
             }
 
             //render scene
-            GL.Viewport(0, 0, Engine.screenWidth, Engine.screenHeight);
+            if (GUIManager.guiEnabled && GUIManager.sceneViewGui != null)
+            {
+                GUIManager.sceneViewGui.CorrectViewport();
+                GUIManager.sceneViewGui.BindFBO();
+            }
+            else
+                GL.Viewport(0, 0, Engine.screenWidth, Engine.screenHeight);
 
             if (postEffects.Count > 0)
                 postProcessBuffers.Item1.Bind();
@@ -168,6 +168,10 @@ namespace AssemblyEngine.Graphics
             foreach (var canvas in canvases)
             {
                 canvas.Draw();
+            }
+            if (GUIManager.guiEnabled && GUIManager.sceneViewGui != null)
+            {
+                GUIManager.sceneViewGui.UnbindFBO();
             }
 
             GUIManager.Render();

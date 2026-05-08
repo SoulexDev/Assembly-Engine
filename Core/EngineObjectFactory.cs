@@ -1,11 +1,14 @@
-﻿namespace AssemblyEngine
+﻿using AssemblyEngine.SceneManagement;
+
+namespace AssemblyEngine
 {
     public class EngineObjectFactory
     {
         public static EngineObject Instantiate(string name)
         {
             EngineObject obj = new EngineObject(name);
-            ASECore.engineObjects.Add(obj);
+
+            SceneManager.activeScene.engineObjects.Add(obj);
             return obj;
         }
     }

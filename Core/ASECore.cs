@@ -1,14 +1,10 @@
-﻿#define EDITOR
-
-using AssemblyEngine.Graphics;
-using AssemblyEngine.Graphics.Testing;
+﻿using AssemblyEngine.Graphics;
 using AssemblyEngine.GUI;
 using AssemblyEngine.Physics;
+using AssemblyEngine.SceneManagement;
 using AssemblyEngine.Testing;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using static SDL3.SDL;
 
 namespace AssemblyEngine
@@ -26,7 +22,7 @@ namespace AssemblyEngine
         public static Shader defaultParticleShader;
         public static Shader defaultUIShader;
 
-        internal static List<EngineObject> engineObjects = new List<EngineObject>();
+        //internal static List<EngineObject> engineObjects = new List<EngineObject>();
 
         private static Stopwatch fixedStepTimer;
         private static long timerOffset;
@@ -56,7 +52,10 @@ namespace AssemblyEngine
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
             GUIManager.Init();
-            GUIManager.EnableGUI();
+            //GUIManager.EnableGUI();
+
+            Scene scene = new Scene("Untitled Scene");
+            SceneManager.SetActiveScene(scene);
 
             fixedStepTimer = new Stopwatch();
             fixedStepTimer.Start();
@@ -77,39 +76,12 @@ namespace AssemblyEngine
                 ("internal/shaders/ui", ShaderType.VertexShader),
                 ("internal/shaders/ui", ShaderType.FragmentShader));
 
-            #region deccer
-
-            ResourceLoader.LoadResource(out Texture2D testTex, "internal/textures/prototype_light.png");
-
-            EngineObject ground = EngineObjectFactory.Instantiate("Ground");
-
-            ModelRenderer m = ground.AddComponent<ModelRenderer>("model renderer");
-            m.SetModel(Cube.Generate(testTex));
-            ground.transform.scale = new Vector3(32, 1, 32);
-
-            BoxCollider col = ground.AddComponent<BoxCollider>("collider");
-
-            for (int i = 0; i < 16; i++)
-            {
-                EngineObject cube = EngineObjectFactory.Instantiate($"cube {i}");
-                cube.transform.position = Vector3.UnitY * (i + 16) * 2 + ASERandom.InSphere(1);
-                cube.AddComponent<ModelRenderer>("model renderer").SetModel(Cube.Generate(testTex));
-                cube.AddComponent<BoxCollider>("collider");
-                cube.AddComponent<RigidBody>("rigidbody");
-            }
-
-            //ResourceLoader.LoadResource(out Model deccerCubes, "Deccer/SM_Deccer_Cubes_Textured_Complex.fbx");
-            //ResourceLoader.LoadResource(out EngineObject deccerObj, "Deccer/SM_Deccer_Cubes_Textured_Complex.fbx");
-
-            //deccerObj.transform.scale = new Vector3(0.01f);
-
-            #endregion
+            //TODO: special internal stuff for rendering to allow users to interface with the rendering system in a managable way
+            //users shouldn't have to set the light resolution everytime. it should be global. they should still be able to change the resolution per light, though
+            //there should be camera components and interal camera. camera components interface with internal cameras
 
             EngineObject freeCam = EngineObjectFactory.Instantiate("Free Cam");
             freeCam.AddComponent<FreeCam>("free cam 1");
-
-            EngineObject freeCamBaby = EngineObjectFactory.Instantiate("Fuck you father");
-            freeCamBaby.transform.SetParent(freeCam.transform);
 
             //ParticleManager.EmitParticles(particlesTex);
 
@@ -123,13 +95,16 @@ namespace AssemblyEngine
             Time.Update();
             Input.Update();
 
-            foreach (var obj in engineObjects)
+            foreach (var scene in SceneManager.loadedScenes)
             {
-                obj.components.ForEach(c => c.Update());
-            }
-            foreach (var obj in engineObjects)
-            {
-                obj.components.ForEach(c => c.LateUpdate());
+                foreach (var obj in scene.engineObjects)
+                {
+                    obj.components.ForEach(c => c.Update());
+                }
+                foreach (var obj in scene.engineObjects)
+                {
+                    obj.components.ForEach(c => c.LateUpdate());
+                }
             }
 
             if (fixedStepTimer.ElapsedMilliseconds + timerOffset > PhysicsSimulation.millisecondsPerTick)
@@ -139,11 +114,14 @@ namespace AssemblyEngine
 
                 Time.FixedUpdate();
 
-                foreach (var obj in engineObjects)
+                foreach (var scene in SceneManager.loadedScenes)
                 {
-                    obj.components.ForEach(c => c.PhysicsTick());
+                    foreach (var obj in scene.engineObjects)
+                    {
+                        obj.components.ForEach(c => c.PhysicsTick());
+                    }
                 }
-
+                
                 PhysicsSimulation.Tick();
             }
             //ParticleManager.UpdateParticles();

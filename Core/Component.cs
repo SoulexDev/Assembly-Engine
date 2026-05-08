@@ -1,5 +1,8 @@
-﻿namespace AssemblyEngine
+﻿using System.Text.Json.Serialization;
+
+namespace AssemblyEngine
 {
+    [JsonSerializable(typeof(Component), GenerationMode = JsonSourceGenerationMode.Default)]
     public class Component
     {
         public string name;

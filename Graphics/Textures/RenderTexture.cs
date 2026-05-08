@@ -7,19 +7,23 @@ namespace AssemblyEngine.Graphics
     {
         private uint fbo;
         private uint rbo;
-        private Texture2D texture;
+        public Texture2D texture;
 
-        private bool usesRBO;
+        //private bool usesRBO;
 
         public int width;
         public int height;
+
+        private RenderTextureType renderTextureType;
 
         public RenderTexture(int width, int height, RenderTextureType renderTextureType, 
             TextureWrapMode textureWrapMode = TextureWrapMode.Repeat, 
             TextureMinFilter minFilter = TextureMinFilter.Linear, 
             TextureMagFilter magFilter = TextureMagFilter.Linear)
         {
-            usesRBO = renderTextureType == RenderTextureType.Normal;
+            this.renderTextureType = renderTextureType;
+
+            //usesRBO = this.renderTextureType == RenderTextureType.Normal;
 
             this.width = width;
             this.height = height;
@@ -66,6 +70,29 @@ namespace AssemblyEngine.Graphics
 
             if (renderTextureType == RenderTextureType.Normal)
                 GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
+        }
+        public void Resize(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+
+            //GL.BindTexture(TextureTarget.Texture2D, texture);
+            texture.Resize(this.width, this.height);
+
+            if (renderTextureType == RenderTextureType.Normal)
+            {
+                GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, rbo);
+                GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.Depth24Stencil8, this.width, this.height);
+
+                GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, RenderbufferTarget.Renderbuffer, rbo);
+                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, texture, 0);
+            }
+            else
+            {
+                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, texture, 0);
+                GL.DrawBuffer(DrawBufferMode.None);
+                GL.ReadBuffer(ReadBufferMode.None);
+            }
         }
         public void Bind()
         {

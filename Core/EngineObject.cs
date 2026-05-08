@@ -1,8 +1,12 @@
-﻿namespace AssemblyEngine
+﻿using System.Text.Json.Serialization;
+
+namespace AssemblyEngine
 {
+    [JsonSerializable(typeof(EngineObject), GenerationMode = JsonSourceGenerationMode.Default)]
     public sealed class EngineObject
     {
         public string name = "Null Name";
+        public Guid objectGuid;
 
         public Transform transform;
         internal List<Component> components = new List<Component>();
@@ -12,11 +16,15 @@
 
         internal EngineObject()
         {
+            objectGuid = Guid.NewGuid();
+
             name = "Engine Object";
             transform = new Transform(this);
         }
         internal EngineObject(string name)
         {
+            objectGuid = Guid.NewGuid();
+
             this.name = name;
             transform = new Transform(this);
         }

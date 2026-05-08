@@ -1,18 +1,22 @@
 ﻿using BepuPhysics;
 using OpenTK.Mathematics;
+using System.Text.Json.Serialization;
 
 namespace AssemblyEngine
 {
+    [JsonSerializable(typeof(Transform), GenerationMode = JsonSourceGenerationMode.Default)]
     public class Transform
     {
-        public bool isDirty = true;
-
         public EngineObject engineObject;
 
         public Transform parent;
         public List<Transform> children = new List<Transform>();
 
-        public Matrix4 transformationMatrix;
+        private Matrix4 translationMatrix;
+        private Matrix4 rotationMatrix;
+        private Matrix4 scaleMatrix;
+
+        public Matrix4 transformationMatrix = Matrix4.Identity;
 
         public delegate void TransformChanged();
         public event TransformChanged OnTransformChanged;
@@ -20,6 +24,10 @@ namespace AssemblyEngine
         public Vector3 localPosition = Vector3.Zero;
         public Quaternion localRotation = Quaternion.Identity;
         public Vector3 localScale = Vector3.One;
+
+        //private Vector3 _globalPosition;
+        //private Quaternion _globalRotation;
+        //private Vector3 _globalScale;
 
         internal Transform()
         {
@@ -29,39 +37,89 @@ namespace AssemblyEngine
         {
             this.engineObject = engineObject;
         }
+        //public Vector3 localPosition
+        //{
+        //    get { return _localPosition; }
+        //    set
+        //    {
+        //        _localPosition = value;
+        //        RecalculateTransformationMatrix();
+
+        //        OnTransformChanged?.Invoke();
+        //    }
+        //}
+        //public Quaternion localRotation
+        //{
+        //    get { return _localRotation; }
+        //    set
+        //    {
+        //        _localRotation = value;
+        //        RecalculateTransformationMatrix();
+
+        //        OnTransformChanged?.Invoke();
+        //    }
+        //}
+        //public Vector3 localScale
+        //{
+        //    get { return _localScale; }
+        //    set
+        //    {
+        //        _localScale = value;
+        //        RecalculateTransformationMatrix();
+
+        //        OnTransformChanged?.Invoke();
+        //    }
+        //}
         public Vector3 position
         {
+            //get
+            //{
+            //    return _globalPosition;
+            //}
+            //set
+            //{
+            //    //transform into local space
+            //    //set local value
+            //    //transform back into world space
+
+            //    localPosition = (new Vector4(value, 1.0f) * transformationMatrix.Inverted()).Xyz;
+            //    _globalPosition = transformationMatrix.ExtractTranslation();
+            //}
             get
             {
                 if (parent == null)
                     return localPosition;
 
-                //Vector3 dir = localPosition;
-                //return (parent.transformationMatrix * transformationMatrix).ExtractTranslation();
                 return parent.position + parent.rotation * localPosition * parent.scale;
             }
             set
             {
                 if (localPosition != value)
                 {
-                    //transformationMatrix = Matrix4.CreateFromQuaternion(localRotation);
-                    //transformationMatrix *= Matrix4.CreateScale(localScale);
-                    //transformationMatrix *= Matrix4.CreateTranslation(localPosition);
-
                     if (parent == null)
                         localPosition = value;
                     else
                         localPosition = value - parent.position;
 
-                    isDirty = true;
+                    //Matrix4.CreateTranslation(position, out translationMatrix);
 
+                    //RecalculateTransformationMatrix();
                     OnTransformChanged?.Invoke();
                 }
             }
         }
         public Quaternion rotation
         {
-            get 
+            //get
+            //{
+            //    return _globalRotation;
+            //}
+            //set
+            //{
+            //    localRotation = value * transformationMatrix.ExtractRotation().Inverted();
+            //    _globalRotation = transformationMatrix.ExtractRotation();
+            //}
+            get
             {
                 if (parent == null)
                     return localRotation;
@@ -76,15 +134,25 @@ namespace AssemblyEngine
                         localRotation = value;
                     else
                         localRotation = value * parent.rotation.Inverted();
-
-                    isDirty = true;
                 }
 
+                //Matrix4.CreateFromQuaternion(rotation, out rotationMatrix);
+
+                //RecalculateTransformationMatrix();
                 OnTransformChanged?.Invoke();
             }
         }
         public Vector3 scale
         {
+            //get
+            //{
+            //    return _globalScale;
+            //}
+            //set
+            //{
+            //    localScale = (new Vector4(value, 1f) * transformationMatrix.Inverted()).Xyz;
+            //    _globalScale = transformationMatrix.ExtractScale();
+            //}
             get
             {
                 if (parent == null)
@@ -100,10 +168,11 @@ namespace AssemblyEngine
                         localScale = value;
                     else if (parent.scale.LengthSquared != 0)
                         localScale = value / parent.scale;
-
-                    isDirty = true;
                 }
 
+                //Matrix4.CreateScale(scale, out scaleMatrix);
+
+                //RecalculateTransformationMatrix();
                 OnTransformChanged?.Invoke();
             }
         }
@@ -140,7 +209,10 @@ namespace AssemblyEngine
                     Vector3 relativePos = position - transform.position;
                     Quaternion relativeRot = rotation * transform.rotation.Inverted();
                     Vector3 relativeScale = scale / transform.scale;
+
                     parent = transform;
+                    transform.children.Add(this);
+
                     localPosition = relativePos;
                     localRotation = relativeRot;
                     localScale = relativeScale;
@@ -172,9 +244,15 @@ namespace AssemblyEngine
                 }
                 else
                 {
+                    parent.children.Remove(this);
                     parent = null;
                 }
             }
+        }
+        private void RecalculateTransformationMatrix()
+        {
+            //TODO: optimize
+            transformationMatrix = scaleMatrix * rotationMatrix * translationMatrix;
         }
         public void Rotate(Vector3 axis, float angle)
         {

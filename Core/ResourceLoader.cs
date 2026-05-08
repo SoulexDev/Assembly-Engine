@@ -30,7 +30,11 @@ namespace AssemblyEngine
         private static Dictionary<string, Texture2D> textureResources = new Dictionary<string, Texture2D>();
         private static Dictionary<string, Shader> shaderResources = new Dictionary<string, Shader>();
 
-        public static bool LoadResource(out Texture2D texture, string filePath)
+        public static bool LoadResource(out Texture2D texture, string filePath, 
+            TextureWrapMode textureWrapMode = TextureWrapMode.Repeat,
+            TextureMinFilter minFilter = TextureMinFilter.Linear,
+            TextureMagFilter magFilter = TextureMagFilter.Linear,
+            bool generateMipMap = true)
         {
             if (textureResources.TryGetValue(filePath, out texture))
                 return true;
@@ -40,7 +44,7 @@ namespace AssemblyEngine
 
             Console.WriteLine("Loading texture " + filePath);
 
-            texture = new Texture2D(filePath);
+            texture = new Texture2D(filePath, textureWrapMode, minFilter, magFilter, generateMipMap);
 
             if (!textureResources.ContainsKey(preProcessFilePath))
                 textureResources.Add(preProcessFilePath, texture);

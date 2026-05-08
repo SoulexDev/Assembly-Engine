@@ -61,10 +61,11 @@ float calculate_shadow(vec4 lightSpaceFragPos, float bias){
 	int sampleCount = 16;
 	float texelSize = 1.0 / 2048.0;
 	
-	float noise = fract(gl_FragCoord.x + gl_FragCoord.y) + interleaved_gradient_noise(gl_FragCoord.xy * gl_FragCoord.yx);
+	float noise = fract(gl_FragCoord.x + gl_FragCoord.y) + interleaved_gradient_noise(gl_FragCoord.xy);
 	float d = fragDepth - bias;
 	float p = get_blocker_dist(noise, projCoords.xy, d, sampleCount);
 	p = max(((d - p) / p) * 128, 1.0);
+	p = min(p, 32.0);
 
 	float shadow = 0.0;
     for (int i = 0; i < sampleCount; i++)
@@ -100,5 +101,4 @@ void main(){
 	shadow = min(shadow, 1.0);
 
 	FragColor = vec4(diffuse * shadow, 1.0);
-	//FragColor = vec4(v_in.texCoord.x, v_in.texCoord.y, 0.0, 1.0);
 }

@@ -3,6 +3,7 @@ using BepuPhysics.Collidables;
 
 namespace AssemblyEngine.Physics
 {
+    [Serializable]
     public class Collider : Component
     {
         internal TypedIndex collidableIndex;

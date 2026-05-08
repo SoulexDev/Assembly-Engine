@@ -10,6 +10,10 @@ namespace AssemblyEngine.Graphics
         public int width;
         public int height;
 
+        private PixelInternalFormat internalPixelFormat;
+        private PixelFormat pixelFormat;
+        private PixelType pixelType;
+
         public static Texture2D Create(string filePath)
         {
             return new Texture2D(filePath);
@@ -50,6 +54,10 @@ namespace AssemblyEngine.Graphics
             TextureMinFilter minFilter = TextureMinFilter.Linear,
             TextureMagFilter magFilter = TextureMagFilter.Linear)
         {
+            this.internalPixelFormat = internalPixelFormat;
+            this.pixelFormat = pixelFormat;
+            this.pixelType = pixelType;
+
             GL.GenTextures(1, out id);
             GL.BindTexture(TextureTarget.Texture2D, id);
 
@@ -61,6 +69,16 @@ namespace AssemblyEngine.Graphics
             GL.TexImage2D(TextureTarget.Texture2D, 0, internalPixelFormat, width, height, 0, pixelFormat, pixelType, 0);
 
             GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
+        internal void Resize(int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+
+            GL.BindTexture(TextureTarget.Texture2D, id);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, this.width, this.height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, 0);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AssignData(string filePath)

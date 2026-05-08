@@ -1,5 +1,4 @@
-﻿using AssemblyEngine.Graphics;
-using static SDL3.SDL;
+﻿using static SDL3.SDL;
 
 namespace AssemblyEngine
 {

@@ -17,7 +17,7 @@ namespace AssemblyEngine.Graphics
                 RenderTextureType.Depth, TextureWrapMode.ClampToBorder,
                 TextureMinFilter.Linear, TextureMagFilter.Linear);
 
-            lightCamera = engineObject.AddComponent<Camera>("light camera").InitializeParameters(50, 50, 1, 1000);
+            lightCamera = engineObject.AddComponent<Camera>("light camera").InitializeParameters(50, 50, 1, 100);
 
             lightType = LightType.Directional;
 

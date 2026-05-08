@@ -18,6 +18,11 @@ namespace AssemblyEngine.Graphics
         {
             
         }
+        public Mesh(PrimitiveType primitiveType, BufferUsageHint drawType)
+        {
+            this.primitiveType = primitiveType;
+            this.drawType = drawType;
+        }
         public Mesh(float[] vertices, PrimitiveType primitiveType, BufferUsageHint drawType, params VertexAttribute[] attributes)
         {
             this.primitiveType = primitiveType;

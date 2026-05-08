@@ -1,14 +1,16 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using System.Text.Json.Serialization;
 
 namespace AssemblyEngine.Graphics
 {
+    [JsonSerializable(typeof(ModelRenderer), GenerationMode = JsonSourceGenerationMode.Default)]
     public sealed class ModelRenderer : Component
     {
         public bool isDirty = true;
 
-        private Model model;
-        public Matrix4 modelMatrix;
+        public Model model;
+        private Matrix4 modelMatrix;
 
         public ModelRenderer()
         {
@@ -43,22 +45,33 @@ namespace AssemblyEngine.Graphics
         {
             this.model = model;
         }
+        public void SetModelMatrix(Matrix4 modelMatrix)
+        {
+            this.modelMatrix = modelMatrix;
+        }
         public void Draw(Camera camera)
         {
-            if (model != null && model.meshes.Count == 0)
+            if (model == null || (model != null && model.meshes.Count == 0))
                 return;
 
-            isDirty = true;
-            if (isDirty)
-            {
-                if (transform != null)
-                {
-                    Matrix4.CreateScale(transform.scale, out modelMatrix);
-                    modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
-                    modelMatrix *= Matrix4.CreateTranslation(transform.position);
-                }
+            //isDirty = true;
+            //if (isDirty)
+            //{
+            //    if (transform != null)
+            //    {
+            //        Matrix4.CreateScale(transform.scale, out modelMatrix);
+            //        modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
+            //        modelMatrix *= Matrix4.CreateTranslation(transform.position);
+            //    }
 
-                isDirty = false;
+            //    isDirty = false;
+            //}
+
+            if (transform != null)
+            {
+                Matrix4.CreateScale(transform.scale, out modelMatrix);
+                modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
+                modelMatrix *= Matrix4.CreateTranslation(transform.position);
             }
 
             foreach (var mesh in model.meshes)
@@ -103,20 +116,27 @@ namespace AssemblyEngine.Graphics
         }
         public void Draw(Camera camera, Shader shader)
         {
-            if (model != null && model.meshes.Count == 0)
+            if (model == null || (model != null && model.meshes.Count == 0))
                 return;
 
-            isDirty = true;
-            if (isDirty)
-            {
-                if (transform != null)
-                {
-                    Matrix4.CreateScale(transform.scale, out modelMatrix);
-                    modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
-                    modelMatrix *= Matrix4.CreateTranslation(transform.position);
-                }
+            //isDirty = true;
+            //if (isDirty)
+            //{
+            //    if (transform != null)
+            //    {
+            //        Matrix4.CreateScale(transform.scale, out modelMatrix);
+            //        modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
+            //        modelMatrix *= Matrix4.CreateTranslation(transform.position);
+            //    }
 
-                isDirty = false;
+            //    isDirty = false;
+            //}
+
+            if (transform != null)
+            {
+                Matrix4.CreateScale(transform.scale, out modelMatrix);
+                modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
+                modelMatrix *= Matrix4.CreateTranslation(transform.position);
             }
 
             shader.Use();
@@ -134,6 +154,10 @@ namespace AssemblyEngine.Graphics
             {
                 mesh.Item1.Draw();
             }
+        }
+        public override void DrawInspector()
+        {
+            
         }
     }
 }
