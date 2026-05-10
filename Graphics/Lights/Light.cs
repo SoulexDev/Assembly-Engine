@@ -38,12 +38,12 @@ namespace AssemblyEngine.Graphics
 
             return this;
         }
-        public void DrawShadows(List<ModelRenderer> modelRenderers)
+        public void DrawShadows(List<IRenderer> renderers)
         {
             switch (lightType)
             {
                 case LightType.Directional:
-                    DrawDirectionalShadow(modelRenderers);
+                    DrawDirectionalShadow(renderers);
                     break;
                 case LightType.Point:
                     break;
@@ -55,7 +55,7 @@ namespace AssemblyEngine.Graphics
                     break;
             }
         }
-        private void DrawDirectionalShadow(List<ModelRenderer> modelRenderers)
+        private void DrawDirectionalShadow(List<IRenderer> renderers)
         {
             Vector3 desiredPosition = Camera.main.transform.position.Floor() - transform.forward * 50;
 
@@ -71,9 +71,9 @@ namespace AssemblyEngine.Graphics
             lightCamera.SetMatrices();
 
             GL.Disable(EnableCap.CullFace);
-            foreach (ModelRenderer modelRenderer in modelRenderers)
+            foreach (IRenderer renderer in renderers)
             {
-                modelRenderer.Draw(lightCamera, RenderPipeline.shadowShader);
+                renderer.Draw(lightCamera, RenderPipeline.shadowShader);
             }
             GL.Enable(EnableCap.CullFace);
 

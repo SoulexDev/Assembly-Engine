@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace AssemblyEngine.Graphics
 {
     [JsonSerializable(typeof(ModelRenderer), GenerationMode = JsonSourceGenerationMode.Default)]
-    public sealed class ModelRenderer : Component
+    public sealed class ModelRenderer : Component, IRenderer
     {
         public bool isDirty = true;
 
@@ -23,19 +23,24 @@ namespace AssemblyEngine.Graphics
 
             isDirty = false;
 
-            RenderPipeline.AddModelRenderer(this);
+            //for (int i = 0; i < model.meshes.Count; i++)
+            //{
+            //    RenderPipeline.AddRenderIndex(i, model.meshes[i].Item2, this);
+            //}
+            RenderPipeline.AddRenderer(this);
         }
-        //~ModelRenderer()
-        //{
-        //    RenderPipeline.RemoveModelRenderer(this);
-        //}
         public override void Init()
         {
-            RenderPipeline.AddModelRenderer(this);
+            //foreach (var mesh in model.meshes)
+            //{
+            //    RenderPipeline.AddRenderIndex(mesh.Item2, this);
+            //}
+            RenderPipeline.AddRenderer(this);
         }
         public override void OnDestroy()
         {
-            RenderPipeline.RemoveModelRenderer(this);
+            RenderPipeline.RemoveRenderer(this);
+            //RenderPipeline.RemoveRenderIndex(this);
         }
         public void SetMaterial(Material mat, int meshIndex = 0)
         {
@@ -53,26 +58,46 @@ namespace AssemblyEngine.Graphics
         {
             if (model == null || (model != null && model.meshes.Count == 0))
                 return;
-
-            //isDirty = true;
-            //if (isDirty)
-            //{
-            //    if (transform != null)
-            //    {
-            //        Matrix4.CreateScale(transform.scale, out modelMatrix);
-            //        modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
-            //        modelMatrix *= Matrix4.CreateTranslation(transform.position);
-            //    }
-
-            //    isDirty = false;
-            //}
-
+            
             if (transform != null)
             {
                 Matrix4.CreateScale(transform.scale, out modelMatrix);
                 modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
                 modelMatrix *= Matrix4.CreateTranslation(transform.position);
             }
+
+            //(Mesh, Material) pair = model.meshes[meshIndex];
+            //Mesh mesh = pair.Item1;
+            //Material mat = pair.Item2;
+
+            //mat.shader.SetMatrix4("uModel", modelMatrix);
+            //mat.shader.SetMatrix4("uView", camera.viewMatrix);
+            //mat.shader.SetMatrix4("uProjection", camera.projectionMatrix);
+
+            //for (int i = 0; i < RenderPipeline.lights.Count; i++)
+            //{
+            //    Light light = RenderPipeline.lights[i];
+
+            //    mat.shader.SetMatrix4("uLightProjection", light.lightCamera.projectionMatrix);
+            //    mat.shader.SetMatrix4("uLightView", light.lightCamera.viewMatrix);
+
+            //    if (light.lightType == LightType.Directional)
+            //        mat.shader.SetVector($"uLightPos{i}", new Vector4(light.transform.forward, 1));
+            //    else
+            //        mat.shader.SetVector($"uLightPos{i}", new Vector4(light.transform.position, 0));
+
+            //    GL.ActiveTexture(TextureUnit.Texture0 + i);
+            //    GL.BindTexture(TextureTarget.Texture2D, light.shadowTex);
+
+            //    mat.shader.SetTexture($"uShadowTex{i}", 0);
+
+            //    //GL.BindTexture(TextureTarget.Texture2D, 0);
+            //}
+
+            //mat.shader.SetVector("uViewPos", camera.transform.position);
+            //mat.shader.SetFloat("uTime", Time.time);
+
+            //mesh.Draw();
 
             foreach (var mesh in model.meshes)
             {
@@ -119,19 +144,6 @@ namespace AssemblyEngine.Graphics
             if (model == null || (model != null && model.meshes.Count == 0))
                 return;
 
-            //isDirty = true;
-            //if (isDirty)
-            //{
-            //    if (transform != null)
-            //    {
-            //        Matrix4.CreateScale(transform.scale, out modelMatrix);
-            //        modelMatrix *= Matrix4.CreateFromQuaternion(transform.rotation);
-            //        modelMatrix *= Matrix4.CreateTranslation(transform.position);
-            //    }
-
-            //    isDirty = false;
-            //}
-
             if (transform != null)
             {
                 Matrix4.CreateScale(transform.scale, out modelMatrix);
@@ -144,10 +156,7 @@ namespace AssemblyEngine.Graphics
             shader.SetMatrix4("uModel", modelMatrix);
             shader.SetMatrix4("uView", camera.viewMatrix);
             shader.SetMatrix4("uProjection", camera.projectionMatrix);
-            //shader.SetMatrix4("uLightSpace", RenderPipeline.sunCam.projectionMatrix * RenderPipeline.sunCam.viewMatrix);
 
-            //shader.SetVector("uLightPos", RenderPipeline.sunCam.transform.position);
-            //shader.SetVector("uViewPos", camera.transform.position);
             shader.SetFloat("uTime", Time.time);
 
             foreach (var mesh in model.meshes)

@@ -16,5 +16,8 @@ namespace AssemblyEngine.Graphics
         public Vector2 size;
         public Color4 color;
         public float life;
+
+        public Vector2 startSize;
+        public float startLife;
     }
 }

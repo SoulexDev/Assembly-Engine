@@ -13,6 +13,5 @@ uniform float uTime;
 //uniform vec3 uViewPos
 
 void main(){
-	vec4 diffuse = texture(uMainTex, v_in.texCoord);
-	FragColor = diffuse;
+	FragColor = texture(uMainTex, v_in.texCoord);
 }

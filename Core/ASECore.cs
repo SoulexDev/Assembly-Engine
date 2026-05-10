@@ -4,6 +4,7 @@ using AssemblyEngine.Physics;
 using AssemblyEngine.SceneManagement;
 using AssemblyEngine.Testing;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using System.Diagnostics;
 using static SDL3.SDL;
 
@@ -19,8 +20,12 @@ namespace AssemblyEngine
         public static event AppInit OnAppInit;
 
         public static Shader defaultShader;
+        public static Shader defaultUnlitShader;
         public static Shader defaultParticleShader;
         public static Shader defaultUIShader;
+
+        public static Material defaultSpriteMaterial;
+        //public static Material defaultParticleMaterial;
 
         //internal static List<EngineObject> engineObjects = new List<EngineObject>();
 
@@ -51,6 +56,7 @@ namespace AssemblyEngine
             {
                 return SDL_AppResult.SDL_APP_FAILURE;
             }
+            
             GUIManager.Init();
             //GUIManager.EnableGUI();
 
@@ -68,6 +74,10 @@ namespace AssemblyEngine
                 ("internal/shaders/simple_lit", ShaderType.VertexShader),
                 ("internal/shaders/simple_lit", ShaderType.FragmentShader));
 
+            ResourceLoader.LoadResource(out defaultUnlitShader,
+                ("internal/shaders/simple_unlit", ShaderType.VertexShader),
+                ("internal/shaders/simple_unlit", ShaderType.FragmentShader));
+
             ResourceLoader.LoadResource(out defaultParticleShader, 
                 ("internal/shaders/particle_unlit", ShaderType.VertexShader),
                 ("internal/shaders/particle_unlit", ShaderType.FragmentShader));
@@ -76,14 +86,24 @@ namespace AssemblyEngine
                 ("internal/shaders/ui", ShaderType.VertexShader),
                 ("internal/shaders/ui", ShaderType.FragmentShader));
 
+            ResourceLoader.LoadResource(out Texture2D particlesTex, "internal/textures/gaussian_circle_1.png");
+            ResourceLoader.LoadResource(out Texture2D spriteTex, "internal/textures/scaryfish.png");
+
+            //defaultParticleMaterial = new Material(defaultParticleShader).EnableBlending(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            defaultSpriteMaterial = new Material(defaultUnlitShader).EnableBlending(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             //TODO: special internal stuff for rendering to allow users to interface with the rendering system in a managable way
             //users shouldn't have to set the light resolution everytime. it should be global. they should still be able to change the resolution per light, though
             //there should be camera components and interal camera. camera components interface with internal cameras
 
-            EngineObject freeCam = EngineObjectFactory.Instantiate("Free Cam");
-            freeCam.AddComponent<FreeCam>("free cam 1");
+            //EngineObject freeCam = EngineObjectFactory.Instantiate("Free Cam");
+            //freeCam.AddComponent<FreeCam>("free cam 1");
 
-            //ParticleManager.EmitParticles(particlesTex);
+            //EngineObject fish = EngineObjectFactory.Instantiate("fishly");
+            //fish.AddComponent<Sprite>("sprite").SetBillboardType(BillboardType.YAxis).SetTexture(spriteTex).SetPixelsPerUnit(128).SetAnchor(new Vector2(0.5f, 0));
+
+            //EngineObject particle = EngineObjectFactory.Instantiate("partic");
+            //particle.AddComponent<Sprite>("sprite").SetBillboardType(BillboardType.YAxis).SetTexture(particlesTex).SetPixelsPerUnit(128).SetAnchor(new Vector2(0.5f, 0));
 
             OnAppInit?.Invoke();
             return SDL_AppResult.SDL_APP_CONTINUE;
@@ -124,7 +144,7 @@ namespace AssemblyEngine
                 
                 PhysicsSimulation.Tick();
             }
-            //ParticleManager.UpdateParticles();
+            ParticleManager.UpdateParticles();
 
             RenderPipeline.Render();
 

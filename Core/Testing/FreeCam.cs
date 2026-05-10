@@ -4,7 +4,7 @@ using static SDL3.SDL;
 
 namespace AssemblyEngine.Testing
 {
-    internal class FreeCam : Component
+    public sealed class FreeCam : Component
     {
         private Camera camera;
         private float mouseX, mouseY;

@@ -33,7 +33,7 @@ namespace AssemblyEngine.Graphics
             //blending, logic op, cull face, depth test
             materialStates = new BitArray([false, false, true, true]);
         }
-        public Material EnabledBlending(BlendingFactor srcBlendMode, BlendingFactor dstBlendMode)
+        public Material EnableBlending(BlendingFactor srcBlendMode, BlendingFactor dstBlendMode)
         {
             materialStates[0] = true;
             this.srcBlendMode = srcBlendMode;
@@ -76,6 +76,42 @@ namespace AssemblyEngine.Graphics
         public Material DisableDepthTest()
         {
             materialStates[3] = false;
+            return this;
+        }
+        public Material Clone()
+        {
+            Material clone = new Material(shader);
+
+            clone.materialStates = new BitArray(materialStates);
+            clone.srcBlendMode = srcBlendMode;
+            clone.dstBlendMode = dstBlendMode;
+            clone.logicOp = logicOp;
+            clone.cullFaceMode = cullFaceMode;
+            clone.depthFunction = depthFunction;
+            clone.texture2Ds = new List<(string, Texture2D)>(texture2Ds);
+            clone.integers = new List<(string, int)>(integers);
+            clone.floats = new List<(string, float)>(floats);
+            clone.vector2s = new List<(string, Vector2)>(vector2s);
+            clone.vector3s = new List<(string, Vector3)>(vector3s);
+            clone.vector4s = new List<(string, Vector4)>(vector4s);
+
+            return clone;
+        }
+        public Material AssignTexture(string textureName, Texture2D texture)
+        {
+            if (!texture2Ds.Exists(t => t.Item1 == textureName))
+            {
+                texture2Ds.Add((textureName, texture));
+            }
+            else
+            {
+                int index = texture2Ds.FindIndex(t => t.Item1 == textureName);
+                if (index == -1)
+                    Console.WriteLine($"Texture {textureName} is not present in material.");
+                else
+                    texture2Ds[index] = (textureName, texture);
+            }
+
             return this;
         }
         public void Use()

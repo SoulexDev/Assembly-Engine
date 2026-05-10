@@ -44,5 +44,12 @@ namespace AssemblyEngine
 
             return new Vector3(x * c, y * c, z * c);
         }
+        public static Vector3 InBox(float sizeX, float sizeY, float sizeZ)
+        {
+            return new Vector3(
+                Range(sizeX * -0.5f, sizeX * 0.5f),
+                Range(sizeY * -0.5f, sizeY * 0.5f),
+                Range(sizeZ * -0.5f, sizeZ * 0.5f));
+        }
     }
 }

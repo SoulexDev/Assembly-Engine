@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>Library</OutputType>
+		<OutputType>Exe</OutputType>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -20,7 +20,7 @@
 		<PackageReleaseNotes>None</PackageReleaseNotes>
 		<Company>The Dev Assembly</Company>
 		<Authors>AndreBluntIndie</Authors>
-		<Version>0.6.4</Version>
+		<Version>0.7.7</Version>
 		<PackageOutputPath>H:\LocalNugetPackages\</PackageOutputPath>
 	</PropertyGroup>
 

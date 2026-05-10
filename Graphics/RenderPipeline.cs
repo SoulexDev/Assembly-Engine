@@ -26,9 +26,11 @@ namespace AssemblyEngine.Graphics
         //to track meshes would be prone to bugs and would be difficult to do properly.
         //meshes are drawn by the renderable, from the renderpipeline material list
 
-        //private static Dictionary<Material, List<ModelRenderIndex>> materialModelLists = new Dictionary<Material, List<ModelRenderIndex>>();
+        //maybe i should do (material, mesh) pairs instead
 
-        private static List<ModelRenderer> modelRenderers = new List<ModelRenderer>();
+        //private static Dictionary<Material, List<RenderIndex>> materialRenderIndices = new Dictionary<Material, List<RenderIndex>>();
+
+        private static List<IRenderer> renderers = new List<IRenderer>();
         private static List<ASXMLCanvas> canvases = new List<ASXMLCanvas>();
         private static List<PostEffect> postEffects = new List<PostEffect>();
         internal static List<Light> lights = new List<Light>();
@@ -85,13 +87,32 @@ namespace AssemblyEngine.Graphics
 
             return true;
         }
-        public static void AddModelRenderer(ModelRenderer modelRenderer)
+        //public static void AddRenderIndex(int index, Material material, IRenderer renderer)
+        //{
+        //    if (!materialRenderIndices.ContainsKey(material))
+        //        materialRenderIndices.Add(material, new List<RenderIndex>());
+
+        //    materialRenderIndices[material].Add(new RenderIndex(renderer, index));
+        //}
+        //public static void RemoveRenderIndex(IRenderer renderer)
+        //{
+        //    //this is probably not the best way to handle this
+        //    for (int i = 0; i < materialRenderIndices.Count; i++)
+        //    {
+        //        int index = materialRenderIndices.ElementAt(i).Value.FindIndex(r => r.renderer == renderer);
+        //        if (index != -1)
+        //        {
+        //            materialRenderIndices.ElementAt(i).Value.RemoveAt(index);
+        //        }
+        //    }
+        //}
+        public static void AddRenderer(IRenderer renderer)
         {
-            modelRenderers.Add(modelRenderer);
+            renderers.Add(renderer);
         }
-        public static void RemoveModelRenderer(ModelRenderer modelRenderer)
+        public static void RemoveRenderer(IRenderer renderer)
         {
-            modelRenderers.Remove(modelRenderer);
+            renderers.Remove(renderer);
         }
         public static void PushPostEffect(PostEffect postEffect)
         {
@@ -107,6 +128,12 @@ namespace AssemblyEngine.Graphics
         }
         public static void Render()
         {
+            if (Camera.main == null)
+            {
+                Console.WriteLine($"Main camera is null: {Camera.main}");
+                return;
+            }
+
             //enable depth testing
             GL.Enable(EnableCap.DepthTest);
 
@@ -117,7 +144,7 @@ namespace AssemblyEngine.Graphics
                 light.transform.rotation = Quaternion.FromAxisAngle(Vector3.UnitY, 50) * 
                     Quaternion.FromAxisAngle(Vector3.UnitX, MathHelper.DegToRad * 45);
 
-                light.DrawShadows(modelRenderers);
+                light.DrawShadows(renderers);
             }
 
             //render scene
@@ -136,13 +163,13 @@ namespace AssemblyEngine.Graphics
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             Camera.main.SetMatrices();
-            foreach (ModelRenderer modelRenderer in modelRenderers)
+            foreach (IRenderer renderer in renderers)
             {
-                modelRenderer.Draw(Camera.main);
+                renderer.Draw(Camera.main);
             }
 
             //render particles
-            //ParticleManager.DrawParticles();
+            ParticleManager.DrawParticles();
 
             //render skybox
             GL.Enable(EnableCap.DepthTest);
